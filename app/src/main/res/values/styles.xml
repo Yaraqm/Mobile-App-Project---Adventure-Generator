@@ -1,0 +1,12 @@
+<resources>
+
+    <!-- Base application theme -->
+    <style name="Theme.LocalAdventureGenerator" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your theme here -->
+        <item name="colorPrimary">@android:color/holo_purple</item>
+        <item name="colorPrimaryVariant">@android:color/holo_blue_bright</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+</resources>

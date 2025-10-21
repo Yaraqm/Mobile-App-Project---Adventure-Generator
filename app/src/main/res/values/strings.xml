@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Mobile Project</string>
+
+    <string name="login_title">Welcome back</string>
+    <string name="register_title">Create account</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Log In</string>
+    <string name="btn_go_to_register">Create a new account</string>
+    <string name="btn_register">Register</string>
+
+    <string name="google_maps_key">AIzaSyDlqeFXiVAvbZD_bMOgQ7SncUk38jJ1ysk</string>
+</resources>
