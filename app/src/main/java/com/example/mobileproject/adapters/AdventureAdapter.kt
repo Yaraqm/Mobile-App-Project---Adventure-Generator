@@ -5,39 +5,50 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mobileproject.R
 import com.example.mobileproject.models.Adventure
 
-class AdventureAdapter(private val adventures: List<Adventure>) :
-    RecyclerView.Adapter<AdventureAdapter.AdventureViewHolder>() {
+class AdventureAdapter(
+    private val onClick: (Adventure) -> Unit
+) : ListAdapter<Adventure, AdventureAdapter.VH>(Diff) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdventureViewHolder {
-        val view = LayoutInflater.from(parent.context)
+    object Diff : DiffUtil.ItemCallback<Adventure>() {
+        override fun areItemsTheSame(old: Adventure, new: Adventure) = old.id == new.id
+        override fun areContentsTheSame(old: Adventure, new: Adventure) = old == new
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_adventure, parent, false)
-        return AdventureViewHolder(view)
+        return VH(v, onClick)
     }
 
-    override fun onBindViewHolder(holder: AdventureViewHolder, position: Int) {
-        val adventure = adventures[position]
-        holder.title.text = adventure.title
-        holder.description.text = adventure.description
-        holder.location.text = adventure.location
-
-        // Load image with Glide if available
-        Glide.with(holder.itemView.context)
-            .load(adventure.imageUrl)
-            .placeholder(R.drawable.ic_placeholder) // add a placeholder image to drawable
-            .into(holder.image)
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = adventures.size
+    class VH(
+        itemView: View,
+        private val onClick: (Adventure) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
 
-    class AdventureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.findViewById(R.id.adventureTitle)
-        val description: TextView = itemView.findViewById(R.id.adventureDescription)
-        val location: TextView = itemView.findViewById(R.id.adventureLocation)
-        val image: ImageView = itemView.findViewById(R.id.adventureImage)
+        private val image: ImageView = itemView.findViewById(R.id.image)
+        private val title: TextView = itemView.findViewById(R.id.title)
+        private val subtitle: TextView = itemView.findViewById(R.id.subtitle)
+        private val location: TextView = itemView.findViewById(R.id.location)
+
+        fun bind(item: Adventure) {
+            title.text = item.title
+            subtitle.text = item.description
+            location.text = item.location
+
+            Glide.with(image).load(item.imageUrl).placeholder(R.drawable.ic_placeholder).into(image)
+
+            itemView.setOnClickListener { onClick(item) }
+        }
     }
 }

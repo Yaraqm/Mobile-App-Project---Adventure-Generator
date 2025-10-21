@@ -10,4 +10,19 @@
     <string name="btn_register">Register</string>
 
     <string name="google_maps_key">AIzaSyDlqeFXiVAvbZD_bMOgQ7SncUk38jJ1ysk</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_rewards">Rewards</string>
+    <string name="nav_profile">Profile</string>
+    <string name="points_format">%1$d pts</string>
+    <string name="error_loading_rewards">Couldn’t load rewards.</string>
+    <string name="cd_reward_image">Reward image</string>
+
+    <string name="rewards_title">Rewards</string>
+    <string name="rewards_empty">No rewards yet — check back soon.</string>
+    <string name="reward_title_placeholder">Reward</string>
+    <string name="reward_desc_placeholder">Reward description</string>
+
+
 </resources>

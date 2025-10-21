@@ -2,4 +2,24 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="app_bg">#0E1117</color>
+    <color name="points_chip_bg">#33FFFFFF</color>
+    <color name="points_chip_ripple">#22FFFFFF</color>
+
+    <!-- Gradient colors used in bg_nav_gradient.xml -->
+    <color name="gradient_start">#5B8DEF</color>
+    <color name="gradient_end">#3A6FE0</color>
+
+    <color name="nav_active">#222222</color>
+    <color name="nav_inactive">#7A7A8C</color>
+
+    <color name="nav_active_bg">#E6E6F5</color>
+
+    <color name="card_stroke">#E6E6EC</color>
+    <color name="text_primary">#101114</color>
+    <color name="text_secondary">#7A7A8C</color>
+    <color name="link_blue">#2F6DFE</color>
+
+
+
 </resources>

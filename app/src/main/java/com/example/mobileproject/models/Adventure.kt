@@ -5,5 +5,9 @@ data class Adventure(
     var title: String? = null,
     var description: String? = null,
     var location: String? = null,
-    var imageUrl: String? = null
+    var imageUrl: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val difficulty: String? = null,
+    val likes: Int? = null
 )
