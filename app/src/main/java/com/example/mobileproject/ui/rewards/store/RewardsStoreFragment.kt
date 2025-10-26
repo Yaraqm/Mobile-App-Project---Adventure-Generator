@@ -1,5 +1,9 @@
 package com.example.mobileproject.ui.rewards.store
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.NumberFormat
+import java.util.Locale
 import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -25,6 +29,9 @@ import java.io.IOException
 
 class RewardsStoreFragment : Fragment() {
 
+    private val firestore = FirebaseFirestore.getInstance()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid
+    private var userPoints = 0
     private var _binding: FragmentRewardsStoreBinding? = null
     private val binding get() = _binding!!
 
@@ -58,6 +65,7 @@ class RewardsStoreFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         loadRewards()
+        loadUserPoints()
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -72,6 +80,27 @@ class RewardsStoreFragment : Fragment() {
             adapter = rewardsStoreAdapter
         }
     }
+
+    // This function will fetch the points from Firestore
+    private fun loadUserPoints() {
+        if (userId == null) {
+            Toast.makeText(requireContext(), "User not logged in.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        firestore.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val points = document.getLong("points") ?: 0L
+                    userPoints = points.toInt()
+                    rewardsStoreAdapter.updateUserPoints(userPoints) // Pass points to the adapter
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Failed to load user points.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     private fun loadRewards() {
         val badges = listOf(
@@ -139,9 +168,8 @@ class RewardsStoreFragment : Fragment() {
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }
 
-        var imageUri: Uri? = null // FIX 1: Make Uri nullable
+        var imageUri: Uri? = null
         try {
-            // FIX 2: Removed redundant 'if' statement
             imageUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
                 ?: throw IOException("Failed to create new MediaStore record.")
 
@@ -150,6 +178,8 @@ class RewardsStoreFragment : Fragment() {
                     inputStream.copyTo(outputStream)
                 }
             }
+            // Point deduction on success
+            deductPointsForBadge(badge)
             Toast.makeText(requireContext(), "${badge.title} badge saved to Downloads", Toast.LENGTH_LONG).show()
         } catch (e: IOException) {
             e.printStackTrace()
@@ -164,7 +194,6 @@ class RewardsStoreFragment : Fragment() {
         try {
             val inputStream = resources.openRawResource(rawResourceId)
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            // Ensure the directory exists
             downloadsDir.mkdirs()
 
             val file = File(downloadsDir, "${badge.title.replace(" ", "_")}_Badge.png")
@@ -173,16 +202,36 @@ class RewardsStoreFragment : Fragment() {
             inputStream.close()
             outputStream.close()
 
-            // Notify the gallery of the new file
             val mediaScanIntent = android.content.Intent(android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
             mediaScanIntent.data = Uri.fromFile(file)
             requireContext().sendBroadcast(mediaScanIntent)
 
+            // Point deduction on success
+            deductPointsForBadge(badge)
             Toast.makeText(requireContext(), "${badge.title} badge saved to Downloads", Toast.LENGTH_LONG).show()
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(requireContext(), "Failed to save badge image.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun deductPointsForBadge(badge: Badge) {
+        if (userId == null) return
+
+        val newPoints = userPoints - badge.pointsRequired
+        if (newPoints < 0) return // Safety check
+
+        firestore.collection("users").document(userId)
+            .update("points", newPoints)
+            .addOnSuccessListener {
+                // Update the local points count and refresh the adapter
+                userPoints = newPoints
+                rewardsStoreAdapter.updateUserPoints(userPoints)
+                Toast.makeText(requireContext(), "${badge.pointsRequired} points deducted.", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Failed to update points: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun onDestroyView() {
