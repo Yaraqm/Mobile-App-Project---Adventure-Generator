@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#A7226E"
+    tools:context=".ui.rewards.store.RewardsStoreFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Rewards Store"
+            app:titleCentered="true"
+            android:fontFamily="@font/poppinssemibold"
+            android:textStyle="bold"
+            app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            app:titleTextColor="@android:color/white"
+            app:navigationIconTint="@android:color/white"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRewardsStore"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_rounded_top_corners"
+        android:padding="8dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_reward_store" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardBadge"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:id="@+id/badge_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- MODIFIED: Increased icon size -->
+        <ImageView
+            android:id="@+id/imgBadgeIcon"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="12dp"
+            tools:src="@drawable/ic_badge_placeholder" /> <!-- Placeholder Icon -->
+
+        <TextView
+            android:id="@+id/tvBadgeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
+            android:textAlignment="center"
+            android:textColor="#34495E"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="The Ultimate Adventurer" />
+
+        <!-- tvBadgeStatus has been removed -->
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

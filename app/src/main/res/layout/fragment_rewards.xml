@@ -1,68 +1,299 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_bg">
+    android:background="#F4F6F7"
+    android:fillViewport="true"
+    tools:context=".ui.rewards.RewardsFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/headerTitle"
-            style="@style/TextAppearance.Material3.TitleLarge"
+        <!-- Header -->
+        <TextView
+            android:layout_width="378dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
+            android:text="Challenges &amp; Rewards"
+            android:textAlignment="center"
+            android:textColor="#34495E"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <!-- Level Progress Card -->
+
+        <TextView
+            android:layout_width="377dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/poppinssemibold"
+            android:gravity="center"
+            android:text="Complete challenges, unlock badges, redeem!"
+            android:textColor="#797D7F"
+            android:textSize="14sp" />
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
-            android:paddingTop="24dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="8dp"
-            android:text="@string/rewards_title"
-            android:textStyle="bold"/>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rewardsRecycler"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/transparent">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:padding="16dp"/>
-
-            <!-- Empty state -->
-            <TextView
-                android:id="@+id/emptyView"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/rewards_empty"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                android:visibility="gone"/>
+                android:background="@drawable/bg_level_progress_card"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <!-- Progress -->
-            <ProgressBar
-                android:id="@+id/progress"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppinssemibold"
+
+                    android:text="Your Level"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <ProgressBar
+                    android:id="@+id/levelProgressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:progressDrawable="@drawable/custom_progress_bar"
+                    tools:progress="60" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tvPointsToNextLevel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppinssemibold"
+                        android:textColor="#EAECEE"
+                        android:textSize="12sp"
+                        tools:text="350 points to Level 13" />
+                    <TextView
+                        android:id="@+id/tvCurrentLevel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppinssemibold"
+                        android:layout_alignParentEnd="true"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        tools:text="Level 12" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Total Points Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/transparent">
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
-        </FrameLayout>
+                android:background="@drawable/bg_total_points_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppinssemibold"
+                        android:text="Total Points"
+                        android:textColor="#FDFEFE"
+                        android:textSize="16sp" />
+                    <TextView
+                        android:id="@+id/tvTotalPoints"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppinssemibold"
+                        android:textColor="@android:color/white"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        tools:text="2,847" />
+                </LinearLayout>
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_bolt"
+                    app:tint="@android:color/white" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <!-- Active Challenges -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="Active Challenges"
+            android:textColor="#34495E"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerChallenges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+        <!-- Your Badges -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="Your Badges"
+            android:textColor="#34495E"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerBadges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+        <!-- Contributor Rewards Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/transparent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_contributor_card"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppinssemibold"
+                        android:layout_weight="1"
+                        android:text="Contributor Score"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_graph"
+                        app:tint="@android:color/white"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvContributorScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppinssemibold"
+                    tools:text="247"
+                    android:textColor="@android:color/white"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#85C1E9"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:rowCount="3">
+                    <TextView android:text="Photos Added" android:textColor="#FDFEFE" android:layout_gravity="start" android:layout_width="wrap_content"/>
+                    <TextView android:id="@+id/tvPhotosAdded" tools:text="12" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
+                    <TextView android:text="Reviews Written" android:textColor="#FDFEFE" android:layout_gravity="start" android:layout_width="wrap_content"/>
+                    <TextView android:id="@+id/tvReviewsWritten" tools:text="8" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
+                    <TextView android:text="New Spots Added" android:textColor="#FDFEFE" android:layout_gravity="start" android:layout_width="wrap_content"/>
+                    <TextView android:id="@+id/tvNewSpotsAdded" tools:text="5" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
+                </GridLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Redeem Button Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnRedeem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/transparent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/bg_redeem_card">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppinssemibold"
+                    android:text="Ready to Redeem?"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppinssemibold"
+                    android:text="Exchange points for exclusive rewards"
+                    android:textColor="#FDFEFE" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/poppinssemibold"
+                    android:text="View Store"
+                    android:textColor="@android:color/white"
+                    app:strokeColor="@android:color/white"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="20dp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="80dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
