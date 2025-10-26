@@ -103,6 +103,9 @@ class RewardsStoreFragment : Fragment() {
 
     private fun getRawResourceIdForBadge(badgeTitle: String): Int? {
         return when (badgeTitle) {
+            "The Extrovert" -> R.raw.badge1
+            "The Tourist" -> R.raw.badge2
+            "The Explorer" -> R.raw.badge3
             "Thrill-Seeker" -> R.raw.badge4
             "Daredevil" -> R.raw.badge5
             "Adventurer" -> R.raw.badge6
