@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         googleMap = map
 
         googleMap.uiSettings.isZoomControlsEnabled = true
+        // Set bottom padding to prevent the Google logo from overlapping the bottom navigation bar
         val bottomPadding = (60 * resources.displayMetrics.density).toInt()
         googleMap.setPadding(0, 0, 0, bottomPadding)
 
@@ -56,22 +58,28 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun loadAdventureMarkers() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val snapshot = db.collection("adventures").get().await()
+                // FIX 1: Query the correct "locations" collection
+                val snapshot = db.collection("locations").get().await()
                 val adventures = snapshot.documents.mapNotNull { it.toObject(Adventure::class.java) }
 
                 for (adventure in adventures) {
-                    if (adventure.latitude != null && adventure.longitude != null) {
-                        val adventureLocation = LatLng(adventure.latitude, adventure.longitude)
+                    // FIX 2: Access latitude and longitude through the 'map_point' object
+                    val lat = adventure.map_point?.latitude
+                    val lng = adventure.map_point?.longitude
+
+                    if (lat != null && lng != null) {
+                        val adventureLocation = LatLng(lat, lng)
                         googleMap.addMarker(
                             MarkerOptions()
                                 .position(adventureLocation)
-                                .title(adventure.title)
+                                // FIX 3: Use 'adventure.name' for the title, not 'adventure.title'
+                                .title(adventure.name)
                         )
-                        // I have removed the line that was causing the issue.
                     }
                 }
             } catch (e: Exception) {
-                // Handle exceptions
+                // It's good practice to log the exception to see what went wrong
+                Log.e("MapFragment", "Error loading adventure markers", e)
             }
         }
     }
@@ -82,6 +90,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            // Request permission from the user
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
         }
@@ -91,8 +100,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 val myLocation = LatLng(it.latitude, it.longitude)
+                // Move the camera to the user's current location
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 12f))
             }
         }
     }
+
+    // Handle the result of the permission request
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1001) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted, enable the location features
+                enableLocation()
+            }
+        }
+    }
 }
+

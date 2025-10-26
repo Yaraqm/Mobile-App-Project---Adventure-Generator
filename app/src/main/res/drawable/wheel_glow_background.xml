@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- The gradient creates the glow effect -->
+    <gradient
+        android:type="radial"
+        android:gradientRadius="52%p"
+        android:startColor="#F7DB4F"
+        android:endColor="@android:color/transparent" />
+
+</shape>

@@ -20,6 +20,16 @@
     <color name="text_secondary">#7A7A8C</color>
     <color name="link_blue">#2F6DFE</color>
 
+    <color name="md_green_500">#acefac</color>       <!-- Rich green -->
+    <color name="md_blue_500">#c5e5e8</color>        <!-- Bright ocean blue -->
+    <color name="md_red_500">#ffa07a</color>         <!-- Bold red -->
+    <color name="md_orange_500">#ffdab9</color>      <!-- Warm orange -->
+    <color name="md_purple_500">#d8bfd8</color>      <!-- Vibrant purple -->
+    <color name="md_teal_500">#9dbf9e</color>        <!-- Deep teal -->
+    <color name="md_brown_500">#c9a98d</color>       <!-- Earthy brown -->
+    <color name="md_pink_500">#ffb6c1</color>
+    <color name="md_blue_grey_500">#f69f95</color>
+
 
 
 </resources>

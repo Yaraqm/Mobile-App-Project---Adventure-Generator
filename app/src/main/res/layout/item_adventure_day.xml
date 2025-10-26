@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="12dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/material_dynamic_tertiary95"
+    app:strokeWidth="2dp"
+    app:strokeColor="#A7226E">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Adventure Day: "
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:textColor="#A7226E"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- EAT Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eats: "
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="#2F9599"
+            android:textStyle="bold"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp"/>
+
+        <FrameLayout
+            android:id="@+id/foodLocationContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- DO Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activity: "
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="#2F9599"
+            android:textStyle="bold"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"/>
+
+        <FrameLayout
+            android:id="@+id/activityLocationContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+
+
+
+
+

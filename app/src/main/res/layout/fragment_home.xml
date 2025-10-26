@@ -1,46 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="12dp"
     tools:context=".fragments.HomeFragment">
 
-    <ImageView
-        android:id="@+id/wheel"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/wheel" />
-
-    <Button
-        android:id="@+id/randomAdventureButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Spin the Wheel" />
-
-    <TextView
-        android:id="@+id/resultText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@android:drawable/editbox_background"
-        android:gravity="center"
-        android:padding="12dp"
-        android:text="Result will be shown here"
-        android:textSize="18sp"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/adventureRecycler"
+    <!-- This ScrollView holds all the main content that should be behind the popup -->
+    <ScrollView
+        android:id="@+id/mainContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        tools:listitem="@layout/item_adventure" />
+        android:fillViewport="true">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Title for the wheel -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:text="Spin for an Adventure!"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- FrameLayout to overlay a pointer and glow on the wheel -->
+            <FrameLayout
+                android:layout_width="370dp"
+                android:layout_height="370dp"
+                android:layout_gravity="center_horizontal">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/wheel_glow_background" />
+
+                <com.example.mobileproject.fragments.LuckyWheelView
+                    android:id="@+id/luckyWheelView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="12dp" />
+
+                <ProgressBar
+                    android:id="@+id/wheelProgressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="#A7226E"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal|top"
+                    android:contentDescription="Pointer"
+                    android:src="@drawable/ic_pointer" />
+
+            </FrameLayout>
+
+            <!-- Container for the action buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/spinButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="#A7226E"
+                    android:text="Spin the Wheel" />
+
+                <Button
+                    android:id="@+id/generateAdventureButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#2E86AB"
+                    android:text="Generate Adventure" />
+
+            </LinearLayout>
+
+            <!-- The result container has been MOVED from here -->
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ==================================================================== -->
+    <!--     POP-UP CONTAINER - This sits on top of all other content         -->
+    <!-- ==================================================================== -->
+    <FrameLayout
+        android:id="@+id/adventurePopupContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <!-- Scrim view to dim the background -->
+        <View
+            android:id="@+id/scrim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#99000000"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- A new LinearLayout to stack the result text and the recycler view -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <!-- Result Display for 'Spin the Wheel' - MOVED HERE -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/resultContainer"
+                android:layout_width="375dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#fbeead"
+                app:cardCornerRadius="12dp"
+                app:contentPadding="16dp"
+                app:strokeColor="#F7DB4F"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/resultText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="✨ Adventure awaits in:  ✨" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- RecyclerView for showing the popup Adventure card(s) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/adventureRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                tools:listitem="@layout/item_adventure_day" />
+
+        </LinearLayout>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
