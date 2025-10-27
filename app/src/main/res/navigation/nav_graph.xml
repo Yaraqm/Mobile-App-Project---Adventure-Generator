@@ -13,7 +13,13 @@
     <fragment
         android:id="@+id/nav_map"
         android:name="com.example.mobileproject.fragments.MapFragment"
-        android:label="@string/nav_map" />
+        android:label="@string/nav_map" >
+        <!-- THIS IS THE NEW ACTION THAT'S BEEN ADDED -->
+        <action
+            android:id="@+id/action_mapFragment_to_locationDetailFragment"
+            app:destination="@id/locationDetailFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/nav_add_spot"
         android:name="com.example.mobileproject.fragments.fragment_add_spot"
@@ -38,5 +44,16 @@
         android:name="com.example.mobileproject.ui.rewards.store.RewardsStoreFragment"
         android:label="Rewards Store"
         tools:layout="@layout/fragment_rewards_store" />
+
+    <!-- THIS IS THE NEW FRAGMENT DESTINATION THAT'S BEEN ADDED -->
+    <fragment
+        android:id="@+id/locationDetailFragment"
+        android:name="com.example.mobileproject.fragments.LocationDetailFragment"
+        android:label="Location Details"
+        tools:layout="@layout/fragment_location_detail" >
+        <argument
+            android:name="locationId"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

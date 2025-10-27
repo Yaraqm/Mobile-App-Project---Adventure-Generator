@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".fragments.LocationDetailFragment">
+
+    <!-- Location Name -->
+    <TextView
+        android:id="@+id/text_location_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Regal Oshawa Centre" />
+
+    <!-- Location Category -->
+    <TextView
+        android:id="@+id/text_location_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/abc_dialog_material_background"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_location_name"
+        tools:text="Entertainment" />
+
+    <!-- Location Description -->
+    <TextView
+        android:id="@+id/text_location_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_location_category"
+        tools:text="Large multiplex cinema showing all the latest blockbuster movies. A great place to hang out with friends." />
+
+    <!-- This LinearLayout is now updated with MaterialButtons and corrected IDs -->
+    <LinearLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/text_location_description">
+
+        <!-- *** MODIFIED BUTTON *** -->
+        <!-- Type is now MaterialButton and ID is corrected to btnAddFavorite -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddFavorite"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="Add to Favorites" />
+
+        <!-- *** MODIFIED BUTTON *** -->
+        <!-- Type is now MaterialButton and ID is corrected to btnVisited -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVisited"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="I Visited!" />
+
+    </LinearLayout>
+
+    <!-- Placeholder for future reviews list -->
+    <TextView
+        android:id="@+id/text_reviews_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Reviews"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttons_layout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

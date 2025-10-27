@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -173,6 +174,11 @@ public class RegisterActivity extends AppCompatActivity {
                 user.put("photoUrl", photoUrl);
                 user.put("points", 0);
                 user.put("joinedAt", FieldValue.serverTimestamp());
+
+                // Initialize empty arrays for favorites and visited locations.
+                user.put("favorited_locations", new ArrayList<String>());
+                // *** THIS IS THE NEW LINE ***
+                user.put("visited_locations", new ArrayList<String>());
 
                 db.collection("users").document(userId).set(user).addOnSuccessListener(aVoid -> {
                     progressBar.setVisibility(View.GONE);
