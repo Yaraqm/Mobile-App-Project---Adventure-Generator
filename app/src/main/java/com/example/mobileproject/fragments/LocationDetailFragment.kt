@@ -1,21 +1,29 @@
 package com.example.mobileproject.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.RatingBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager // <<< --- NEW IMPORT
 import com.example.mobileproject.R
+import com.example.mobileproject.adapters.ReviewAdapter // <<< --- NEW IMPORT
 import com.example.mobileproject.databinding.FragmentLocationDetailBinding
+import com.example.mobileproject.models.Review
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Query // <<< --- NEW IMPORT
 
 data class LocationDetails(
     val name: String? = null,
@@ -48,19 +56,114 @@ class LocationDetailFragment : Fragment() {
         Log.d("LocationDetailFragment", "Received location ID: $currentLocationId")
 
         fetchLocationDetails(currentLocationId)
-
-        // Check status for BOTH buttons
         checkIfFavorited()
-        checkIfVisited() // <<< --- NEW
+        checkIfVisited()
+        setupReviewsRecyclerView() // <<< --- NEW: SET UP THE REVIEWS LIST
 
-        // Set up click listeners for BOTH buttons
         binding.btnAddFavorite.setOnClickListener {
             addOrRemoveFavorite()
         }
-        binding.btnVisited.setOnClickListener { // <<< --- NEW
+        binding.btnVisited.setOnClickListener {
             addOrRemoveVisited()
         }
+        binding.btnLeaveReview.setOnClickListener {
+            showLeaveReviewDialog()
+        }
     }
+
+    // *** NEW: FUNCTION TO SET UP THE RECYCLERVIEW AND FETCH REVIEWS ***
+    private fun setupReviewsRecyclerView() {
+        binding.reviewsRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        firestore.collection("locations").document(currentLocationId)
+            .collection("reviews")
+            .orderBy("timestamp", Query.Direction.DESCENDING) // Show newest reviews first
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.d("LocationDetailFragment", "No reviews found.")
+                    // Optionally, you could show a "No reviews yet" message here
+                } else {
+                    val reviews = documents.toObjects(Review::class.java)
+                    val adapter = ReviewAdapter(reviews)
+                    binding.reviewsRecyclerView.adapter = adapter
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("LocationDetailFragment", "Error getting reviews: ", exception)
+                Toast.makeText(context, "Failed to load reviews.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun showLeaveReviewDialog() {
+        val user = auth.currentUser
+        if (user == null) {
+            Toast.makeText(context, "You must be logged in to leave a review.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_leave_review, null)
+        val ratingBar = dialogView.findViewById<RatingBar>(R.id.rating_bar)
+        val editTextReview = dialogView.findViewById<EditText>(R.id.edit_text_review)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Leave a Review")
+            .setView(dialogView)
+            .setPositiveButton("Submit") { dialog, _ ->
+                val rating = ratingBar.rating
+                val reviewText = editTextReview.text.toString().trim()
+
+                if (reviewText.isNotEmpty() && rating > 0) {
+                    submitReview(user, rating, reviewText)
+                } else {
+                    Toast.makeText(context, "Please provide a rating and a comment.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.cancel()
+            }
+            .show()
+    }
+
+    private fun submitReview(user: FirebaseUser, rating: Float, reviewText: String) {
+        firestore.collection("users").document(user.uid).get()
+            .addOnSuccessListener { userDoc ->
+                if (userDoc == null || !userDoc.exists()) {
+                    Toast.makeText(context, "Could not find user data.", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                val userName = userDoc.getString("name") ?: "Anonymous"
+                val userPhotoUrl = userDoc.getString("photoUrl")
+
+                val review = Review(
+                    userId = user.uid,
+                    userName = userName,
+                    userPhotoUrl = userPhotoUrl,
+                    rating = rating,
+                    text = reviewText
+                )
+
+                firestore.collection("locations").document(currentLocationId)
+                    .collection("reviews")
+                    .add(review)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Review submitted successfully!", Toast.LENGTH_SHORT).show()
+                        // *** NEW: Refresh the reviews list after submitting a new one ***
+                        setupReviewsRecyclerView()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("LocationDetailFragment", "Error submitting review", e)
+                        Toast.makeText(context, "Failed to submit review.", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("LocationDetailFragment", "Error fetching user details for review", e)
+                Toast.makeText(context, "Could not fetch user details.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // --- ALL THE OTHER FUNCTIONS (fetchLocationDetails, addOrRemoveFavorite, etc.) REMAIN UNCHANGED ---
 
     private fun fetchLocationDetails(locationId: String) {
         firestore.collection("locations").document(locationId)
@@ -82,7 +185,6 @@ class LocationDetailFragment : Fragment() {
             }
     }
 
-    // --- FAVORITES LOGIC (NO CHANGES) ---
     private fun checkIfFavorited() {
         val userId = auth.currentUser?.uid ?: return
         firestore.collection("users").document(userId).get()
@@ -114,9 +216,7 @@ class LocationDetailFragment : Fragment() {
                 Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
                 updateFavoriteButtonUI(newFavoriteState)
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Error updating favorites", Toast.LENGTH_SHORT).show()
-            }
+            .addOnFailureListener { Toast.makeText(context, "Error updating favorites", Toast.LENGTH_SHORT).show() }
     }
 
     private fun updateFavoriteButtonUI(isFavorited: Boolean) {
@@ -130,12 +230,6 @@ class LocationDetailFragment : Fragment() {
         }
     }
 
-    // --- VISITED LOGIC (ALL NEW) ---
-
-    /**
-     * <<< --- NEW FUNCTION --- >>>
-     * Checks if the current location is already in the user's visited list.
-     */
     private fun checkIfVisited() {
         val userId = auth.currentUser?.uid ?: return
         firestore.collection("users").document(userId).get()
@@ -150,10 +244,6 @@ class LocationDetailFragment : Fragment() {
             }
     }
 
-    /**
-     * <<< --- NEW FUNCTION --- >>>
-     * Adds or removes the location from the user's visited list.
-     */
     private fun addOrRemoveVisited() {
         val userId = auth.currentUser?.uid
         if (userId == null) {
@@ -171,20 +261,13 @@ class LocationDetailFragment : Fragment() {
                 Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
                 updateVisitedButtonUI(newVisitedState)
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Error updating visited log", Toast.LENGTH_SHORT).show()
-            }
+            .addOnFailureListener { Toast.makeText(context, "Error updating visited log", Toast.LENGTH_SHORT).show() }
     }
 
-    /**
-     * <<< --- NEW FUNCTION --- >>>
-     * Updates the "I Visited!" button's appearance.
-     */
     private fun updateVisitedButtonUI(isVisited: Boolean) {
         val button = binding.btnVisited as MaterialButton
         if (isVisited) {
             button.text = "Visited"
-            // You might want a different icon for visited, like 'ic_check'
             button.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_check)
         } else {
             button.text = "I Visited!"

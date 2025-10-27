@@ -7,39 +7,77 @@
     tools:context=".fragments.MapFragment">
 
     <!--
-        This is the SupportMapFragment. It is a special Fragment provided by Google
-        that will contain and manage the lifecycle of the Google Map view.
-        We are changing the tag from '<fragment>' to '<androidx.fragment.app.FragmentContainerView>'
-        which is the more modern and recommended approach.
+        This is the SupportMapFragment. It now sits at the base layer,
+        filling the entire parent. The UI panel will be drawn on top of it.
     -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--
-        This is the search bar, added now to prepare for the search functionality requirement.
-        It's styled to look like a modern search bar with a background and hint text,
-        and it sits on top of the map.
+        *** NEW: UI Panel Layout ***
+        This layout group contains the search and filter UI.
+        It sits at the top of the screen and has its own background and elevation,
+        ensuring it renders as a single unit on top of the map and correctly
+        receives all touch events within its bounds.
     -->
-    <SearchView
-        android:id="@+id/searchView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ui_panel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/abc_dialog_material_background"
+        android:background="?android:colorBackground"
         android:elevation="4dp"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search for a location..."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Search bar, constrained within the new UI panel -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/map_search_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/search_view_background"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search for a location..."
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Chip group, constrained within the new UI panel -->
+        <HorizontalScrollView
+            android:id="@+id/category_scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/map_search_view">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/category_chip_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                app:singleSelection="true">
+
+                <!-- Chips will be added here dynamically from the code -->
+
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

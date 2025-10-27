@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@id/text_location_category"
         tools:text="Large multiplex cinema showing all the latest blockbuster movies. A great place to hang out with friends." />
 
-    <!-- This LinearLayout is now updated with MaterialButtons and corrected IDs -->
+    <!-- This LinearLayout contains the Favorite and Visited buttons -->
     <LinearLayout
         android:id="@+id/buttons_layout"
         android:layout_width="match_parent"
@@ -55,8 +55,6 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/text_location_description">
 
-        <!-- *** MODIFIED BUTTON *** -->
-        <!-- Type is now MaterialButton and ID is corrected to btnAddFavorite -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddFavorite"
             style="?attr/materialButtonOutlinedStyle"
@@ -66,8 +64,6 @@
             android:layout_weight="1"
             android:text="Add to Favorites" />
 
-        <!-- *** MODIFIED BUTTON *** -->
-        <!-- Type is now MaterialButton and ID is corrected to btnVisited -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVisited"
             style="?attr/materialButtonOutlinedStyle"
@@ -78,7 +74,7 @@
 
     </LinearLayout>
 
-    <!-- Placeholder for future reviews list -->
+    <!-- Reviews Title -->
     <TextView
         android:id="@+id/text_reviews_title"
         android:layout_width="wrap_content"
@@ -88,5 +84,29 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/buttons_layout" />
+
+    <!-- *** NEW: "Leave a Review" Button *** -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_leave_review"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leave a Review"
+        app:icon="@drawable/ic_edit"
+        app:layout_constraintBottom_toBottomOf="@id/text_reviews_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/text_reviews_title" />
+
+    <!-- *** NEW: RecyclerView to display the list of reviews *** -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/reviews_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_reviews_title"
+        tools:listitem="@layout/item_review" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
