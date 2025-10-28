@@ -119,10 +119,14 @@ class ProfileFragment : Fragment() {
                     val photoUrl = document.getString("photoUrl")
                     val points = document.getLong("points") ?: 0
                     val joinedAt = document.getTimestamp("joinedAt")
+                    val bio = document.getString("bio") ?: ""
 
                     binding.userName.text = name
                     binding.userEmail.text = email
                     binding.userPoints.text = "$points"
+
+                    // Bio text
+                    binding.userBio.text = if (bio.isNotBlank()) bio else "Tap to add a short bio..."
 
                     joinedAt?.let {
                         val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
@@ -138,7 +142,13 @@ class ProfileFragment : Fragment() {
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
+
+        // ✅ Set up tap-to-edit behavior
+        binding.userBio.setOnClickListener {
+            showEditBioDialog()
+        }
     }
+
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -242,6 +252,40 @@ class ProfileFragment : Fragment() {
             }
     }
 
+    private fun showEditBioDialog() {
+        val userId = auth.currentUser?.uid ?: return
+        val currentBio = binding.userBio.text.toString().takeIf { it != "Tap to add a short bio..." } ?: ""
+
+        val input = android.widget.EditText(requireContext()).apply {
+            setText(currentBio)
+            hint = "Enter your bio"
+            setPadding(40, 40, 40, 40)
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Edit Bio")
+            .setView(input)
+            .setPositiveButton("Save") { dialog, _ ->
+                val newBio = input.text.toString().trim()
+
+                // Update Firestore dynamically
+                db.collection("users").document(userId)
+                    .update("bio", newBio)
+                    .addOnSuccessListener {
+                        binding.userBio.text = if (newBio.isNotEmpty()) newBio else "Tap to add a short bio..."
+                        Toast.makeText(requireContext(), "Bio updated!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(requireContext(), "Failed to update bio: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+
     private fun deletePhoto(photo: Photo) {
         val userId = auth.currentUser?.uid ?: return
         lifecycleScope.launch {
@@ -285,3 +329,6 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 }
+
+
+
