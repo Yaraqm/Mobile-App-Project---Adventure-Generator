@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    This is the root layout for the map screen.
+    ConstraintLayout is used because it is powerful for creating complex and responsive UIs.
+    It allows us to layer views (like UI panels on top of a map) and define relationships
+    between them, which is exactly what we need for this screen.
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,8 +13,13 @@
     tools:context=".fragments.MapFragment">
 
     <!--
-        This is the SupportMapFragment. It now sits at the base layer,
-        filling the entire parent. The UI panel will be drawn on top of it.
+        LAYER 1: The Map (Base Layer)
+
+        This is the container for the Google Map.
+        - It is placed as the first child so it acts as the base layer, occupying the entire screen.
+        - `android:layout_width="0dp"` and `android:layout_height="0dp"` tell it to "match constraints".
+        - By constraining it to all four sides of the parent, it expands to fill the whole area.
+        - All other UI elements will be rendered on top of this map view.
     -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
@@ -21,11 +32,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--
-        *** NEW: UI Panel Layout ***
-        This layout group contains the search and filter UI.
-        It sits at the top of the screen and has its own background and elevation,
-        ensuring it renders as a single unit on top of the map and correctly
-        receives all touch events within its bounds.
+        LAYER 2: The UI Panel (Top Layer)
+
+        This layout groups the search bar and filter chips into a single, cohesive UI panel.
+        - It is placed after the map, so it renders on top of it.
+        - `android:layout_width="0dp"` makes it span the full width of the screen.
+        - `android:layout_height="wrap_content"` makes it only as tall as its contents (the search bar and chips).
+        - `app:layout_constraintTop_toTopOf="parent"` anchors this entire panel to the top of the screen.
+        - `android:elevation="4dp"` lifts the panel visually and gives it a subtle shadow, separating it from the map.
+        - `android:background="?android:colorBackground"` gives it a solid background so the map doesn't show through.
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ui_panel"
@@ -37,7 +52,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Search bar, constrained within the new UI panel -->
+        <!--
+            Child of UI Panel: The Search Bar
+            - This view is for user text input to search for locations.
+            - It's constrained to the top, start, and end of its parent (the `ui_panel`).
+            - Margins provide spacing from the screen edges.
+            - `app:queryHint` shows placeholder text.
+            - The background is a custom drawable for rounded corners.
+        -->
         <androidx.appcompat.widget.SearchView
             android:id="@+id/map_search_view"
             android:layout_width="0dp"
@@ -52,7 +74,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Chip group, constrained within the new UI panel -->
+        <!--
+            Child of UI Panel: The Filter Chip Scroller
+            - HorizontalScrollView allows the ChipGroup to be scrolled horizontally if there are
+              too many categories.
+            - `android:scrollbars="none"` hides the unsightly scrollbar.
+            - It's constrained below the search bar and to the bottom of the `ui_panel`, completing the panel's layout.
+        -->
         <HorizontalScrollView
             android:id="@+id/category_scroll_view"
             android:layout_width="0dp"
@@ -63,6 +91,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/map_search_view">
 
+            <!--
+                The ChipGroup holds the filter chips (e.g., "All", "Fitness").
+                - `app:singleSelection="true"` ensures only one chip can be selected at a time.
+                - Padding gives the chips some breathing room inside the scroller.
+                - The actual Chip views are added dynamically from your Kotlin code.
+            -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/category_chip_group"
                 android:layout_width="wrap_content"
