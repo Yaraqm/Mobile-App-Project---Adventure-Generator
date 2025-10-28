@@ -1,51 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:background="#F4F4F4"
     tools:context=".fragments.ProfileFragment">
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
+        <!-- ░░░ HEADER ░░░ -->
         <LinearLayout
+            android:id="@+id/headerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:background="@drawable/bg_profile_header"
+            android:orientation="vertical"
+            android:gravity="center" />
+
+        <!-- ░░░ MAIN CONTENT ░░░ -->
+        <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="180dp"
             android:padding="20dp">
 
+            <!-- ░░░ USER CARD ░░░ -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="15dp"
-                app:cardElevation="5dp">
+                app:cardElevation="5dp"
+                android:background="#FFFFFF"
+                android:layout_marginTop="80dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp"
+                    android:paddingBottom="24dp"
+                    android:paddingHorizontal="24dp"
                     android:gravity="center_horizontal">
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/profileImage"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:src="@drawable/ic_launcher_background" 
-                        app:civ_border_width="2dp"
-                        app:civ_border_color="#FFFFFF"/>
 
                     <TextView
                         android:id="@+id/userName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="70dp"
                         android:text="User Name"
                         android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#000000" />
 
                     <TextView
                         android:id="@+id/userEmail"
@@ -53,79 +63,215 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="user.email@example.com"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:textColor="#555555" />
 
+                    <TextView
+                        android:id="@+id/joinedAt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Joined: ..."
+                        android:textSize="14sp"
+                        android:textColor="#888888" />
+
+                    <!-- Bio -->
+                    <TextView
+                        android:id="@+id/userBio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Tap to add a short bio..."
+                        android:textColor="#777777"
+                        android:textSize="14sp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_horizontal" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- ░░░ STATS CARD ░░░ -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 app:cardCornerRadius="15dp"
-                app:cardElevation="5dp">
+                app:cardElevation="5dp"
+                android:background="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal"
+                    android:weightSum="4"
+                    android:padding="16dp"
+                    android:gravity="center">
 
+                    <!-- Spots -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingVertical="12dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_myplaces" 
-                            android:layout_gravity="center_vertical"/>
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/userSpotsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="#2F9599" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Spots"
+                            android:textSize="13sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+
+                    <!-- Friends -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/userFriendsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="#2F9599" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Friends"
+                            android:textSize="13sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+
+                    <!-- Reviews -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/userReviewsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="#2F9599" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reviews"
+                            android:textSize="13sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+
+                    <!-- Points -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
                         <TextView
                             android:id="@+id/userPoints"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:text="Points: 0"
-                            android:textSize="16sp"/>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEEEEE"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingVertical="12dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_today" 
-                            android:layout_gravity="center_vertical"/>
+                            android:text="0"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="#2F9599" />
                         <TextView
-                            android:id="@+id/joinedAt"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:text="Joined: ..."
-                            android:textSize="16sp"/>
+                            android:text="Points"
+                            android:textSize="13sp"
+                            android:textColor="#888888" />
                     </LinearLayout>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- ░░░ TABS + GRID ░░░ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/profileTabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:tabIndicatorColor="#A7226E"
+                    app:tabSelectedTextColor="#A7226E"
+                    app:tabTextColor="#888888"
+                    android:background="#FFFFFF">
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:icon="@android:drawable/ic_menu_gallery"
+                        android:text="Pictures" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:icon="@android:drawable/btn_star_big_on"
+                        android:text="Favorites" />
+                </com.google.android.material.tabs.TabLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/profileRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:clipToPadding="false" />
+            </LinearLayout>
+
+            <!-- ░░░ UPLOAD PHOTO FLOATING BUTTON ░░░ -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnUploadPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:src="@android:drawable/ic_menu_add"
+                app:backgroundTint="#A7226E"
+                app:tint="@android:color/white" />
+
+            <!-- ░░░ LOGOUT ░░░ -->
             <Button
                 android:id="@+id/logoutButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="85dp"
                 android:layout_marginTop="24dp"
                 android:text="Log Out"
-                android:backgroundTint="@android:color/holo_red_light" />
-
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#EC2049" />
         </LinearLayout>
-    </ScrollView>
 
-</RelativeLayout>
+        <!-- ░░░ PROFILE IMAGE (Floating on top of both header + card) ░░░ -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImage"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="150dp"
+            android:src="@drawable/ic_launcher_background"
+            app:civ_border_width="4dp"
+            app:civ_border_color="#FFFFFF"
+            android:elevation="10dp" />
+    </FrameLayout>
+</ScrollView>
