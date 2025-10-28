@@ -265,8 +265,8 @@
         <!-- ░░░ PROFILE IMAGE (Floating on top of both header + card) ░░░ -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profileImage"
-            android:layout_width="190dp"
-            android:layout_height="190dp"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
             android:layout_gravity="top|center_horizontal"
             android:layout_marginTop="150dp"
             android:src="@drawable/ic_launcher_background"
