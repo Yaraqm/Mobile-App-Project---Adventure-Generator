@@ -235,8 +235,8 @@
                     <TextView android:id="@+id/tvPhotosAdded" tools:text="12" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
                     <TextView android:text="Reviews Written" android:textColor="#FDFEFE" android:layout_gravity="start" android:layout_width="wrap_content"/>
                     <TextView android:id="@+id/tvReviewsWritten" tools:text="8" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
-                    <TextView android:text="New Spots Added" android:textColor="#FDFEFE" android:layout_gravity="start" android:layout_width="wrap_content"/>
-                    <TextView android:id="@+id/tvNewSpotsAdded" tools:text="5" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
+                    <TextView android:text="Spots Visited" android:textColor="#FDFEFE" android:layout_gravity="start" android:layout_width="wrap_content"/>
+                    <TextView android:id="@+id/tvSpotsVisited" tools:text="5" android:textColor="@android:color/white" android:layout_gravity="end" android:layout_width="wrap_content"/>
                 </GridLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

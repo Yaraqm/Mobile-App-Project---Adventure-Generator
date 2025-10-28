@@ -32,6 +32,9 @@ class RewardsFragment : Fragment() {
     private var userListener: ListenerRegistration? = null
     private var challengesListener: ListenerRegistration? = null
     private var photosListener: ListenerRegistration? = null
+    private var reviewsListener: ListenerRegistration? = null // Added for future use
+    private var spotsVisitedListener: ListenerRegistration? = null // Added for future use
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -60,6 +63,8 @@ class RewardsFragment : Fragment() {
         userListener?.remove()
         challengesListener?.remove()
         photosListener?.remove()
+        reviewsListener?.remove()
+        spotsVisitedListener?.remove()
     }
 
     private fun setupRecyclerViews() {
@@ -90,18 +95,17 @@ class RewardsFragment : Fragment() {
                 }
                 if (snapshot != null && snapshot.exists()) {
                     val points = snapshot.getLong("points") ?: 0L
-                    val photosAdded = snapshot.getLong("photosAdded") ?: 0L
+                    // Static values from the document
                     val reviewsWritten = snapshot.getLong("reviewsWritten") ?: 0L
-                    val newSpotsAdded = snapshot.getLong("newSpotsAdded") ?: 0L
+                    val spotsVisited = snapshot.getLong("spotsVisited") ?: 0L
 
                     binding.tvTotalPoints.text = NumberFormat.getNumberInstance(Locale.US).format(points)
                     badgeAdapter.updateUserPoints(points.toInt())
 
-                    val contributorScore = photosAdded * 10 + reviewsWritten * 5 + newSpotsAdded * 20
-                    binding.tvContributorScore.text = contributorScore.toString()
-                    binding.tvPhotosAdded.text = photosAdded.toString()
+                    // Set static text views
                     binding.tvReviewsWritten.text = reviewsWritten.toString()
-                    binding.tvNewSpotsAdded.text = newSpotsAdded.toString()
+                    binding.tvSpotsVisited.text = spotsVisited.toString()
+                    updateContributorScore() // Calculate score
 
                     val level = (points / 1000).toInt() + 1
                     val pointsForCurrentLevel = (level - 1) * 1000
@@ -120,6 +124,16 @@ class RewardsFragment : Fragment() {
             }
     }
 
+    private fun updateContributorScore() {
+        val photosAdded = binding.tvPhotosAdded.text.toString().toLongOrNull() ?: 0L
+        val reviewsWritten = binding.tvReviewsWritten.text.toString().toLongOrNull() ?: 0L
+        val spotsVisited = binding.tvSpotsVisited.text.toString().toLongOrNull() ?: 0L
+
+        val contributorScore = photosAdded + reviewsWritten + spotsVisited
+        binding.tvContributorScore.text = contributorScore.toString()
+    }
+
+
     private fun loadChallenges(userId: String) {
         challengesListener = firestore.collection("challenges")
             .whereEqualTo("active", true)
@@ -136,7 +150,7 @@ class RewardsFragment : Fragment() {
     }
 
     private fun listenToPhotoChallengeProgress(userId: String, completions: Int) {
-        photosListener?.remove() // Remove previous listener
+        photosListener?.remove()
         photosListener = firestore.collection("users").document(userId).collection("photos")
             .addSnapshotListener { photosSnapshot, error ->
                 if (error != null) {
@@ -146,9 +160,12 @@ class RewardsFragment : Fragment() {
 
                 val photoCount = photosSnapshot?.size() ?: 0
                 challengeAdapter.updatePhotoChallengeProgress("photos", photoCount, completions)
+                binding.tvPhotosAdded.text = photoCount.toString()
+
+                updateContributorScore()
 
                 val photoChallenge = challengeAdapter.getChallengeByType("photos") ?: return@addSnapshotListener
-                
+
                 val newCompletions = photoCount / photoChallenge.goal
 
                 if (newCompletions > completions) {
@@ -157,6 +174,7 @@ class RewardsFragment : Fragment() {
                 }
             }
     }
+
 
     private fun awardPointsForPhotoChallenge(userId: String, challenge: Challenge, completionsToAward: Int, totalCompletions: Int) {
         val userRef = firestore.collection("users").document(userId)
