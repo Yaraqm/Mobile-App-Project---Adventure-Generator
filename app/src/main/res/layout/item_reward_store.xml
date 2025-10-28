@@ -28,13 +28,13 @@
             android:id="@+id/tvRewardTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="12dp"
             android:ellipsize="end"
             android:fontFamily="@font/poppinssemibold"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,21 +48,25 @@
             android:layout_marginTop="4dp"
             android:fontFamily="@font/poppinssemibold"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/gray"
             app:layout_constraintStart_toStartOf="@+id/tvRewardTitle"
             app:layout_constraintTop_toBottomOf="@+id/tvRewardTitle"
             tools:text="1000 Points" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRedeem"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="15dp"
             android:text="Redeem"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvRewardPrice" />
+            app:layout_constraintTop_toBottomOf="@+id/tvRewardPrice"
+            android:textColor="#A7226E"
+            app:strokeColor="#A7226E"
+            app:strokeWidth="2dp"
+            app:cornerRadius="20dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

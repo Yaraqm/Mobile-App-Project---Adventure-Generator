@@ -38,6 +38,7 @@
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_reward_store" />
+        tools:listitem="@layout/item_reward_store"
+        android:clipToPadding="false"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

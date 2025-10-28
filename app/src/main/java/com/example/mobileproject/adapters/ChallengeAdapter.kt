@@ -3,7 +3,7 @@ package com.example.mobileproject.ui.rewards
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mobileproject.R // Import R
+import com.example.mobileproject.R
 import com.example.mobileproject.databinding.ItemChallengeBinding
 
 data class Challenge(
@@ -13,8 +13,9 @@ data class Challenge(
     val points: Int = 0,
     val goal: Int = 0,
     val fieldType: String = "",
-    val icon: String = "", // Add this for the icon name (e.g., "ic_new_spot")
-    var progress: Int = 0 // Add this to hold current progress
+    val icon: String = "",
+    var progress: Int = 0,
+    var completions: Int = 0
 )
 
 class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHolder>() {
@@ -25,6 +26,28 @@ class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHold
         items.clear()
         items.addAll(list)
         notifyDataSetChanged()
+    }
+
+    fun getChallengeByType(type: String): Challenge? {
+        return items.find { it.fieldType == type }
+    }
+
+    fun updateChallengeProgress(fieldType: String, currentProgress: Int) {
+        val challengeIndex = items.indexOfFirst { it.fieldType == fieldType }
+        if (challengeIndex != -1) {
+            items[challengeIndex].progress = currentProgress
+            notifyItemChanged(challengeIndex)
+        }
+    }
+
+    fun updatePhotoChallengeProgress(fieldType: String, currentProgress: Int, completions: Int) {
+        val challengeIndex = items.indexOfFirst { it.fieldType == fieldType }
+        if (challengeIndex != -1) {
+            val challenge = items[challengeIndex]
+            challenge.progress = currentProgress
+            challenge.completions = completions
+            notifyItemChanged(challengeIndex)
+        }
     }
 
     inner class ChallengeViewHolder(val binding: ItemChallengeBinding) :
@@ -42,14 +65,28 @@ class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHold
         holder.binding.tvChallengeTitle.text = item.title
         holder.binding.tvChallengeReward.text = "Reward\n+${item.points}"
 
-        // Set progress to a static 0%
-        val progressPercentage = 0
+        var displayProgress = item.progress
+        var displayGoal = item.goal
+        
+        if (item.fieldType == "photos") {
+            displayGoal = item.goal * (item.completions + 1)
+        }
+        
+        val progressPercentage = if (displayGoal > 0) (displayProgress * 100 / displayGoal).coerceAtMost(100) else 0
         holder.binding.progressChallenge.progress = progressPercentage
-        holder.binding.tvChallengeProgressText.text = "$progressPercentage% Complete"
 
-        // Dynamically set icon based on `fieldType` or a dedicated `icon` field
+        val unit = when(item.fieldType) {
+            "photos" -> "Photos"
+            "spots" -> "Spots"
+            "reviews" -> "Reviews"
+            else -> ""
+        }
+        
+        val progressText = if (unit.isNotEmpty()) "$displayProgress/$displayGoal $unit" else "$displayProgress/$displayGoal"
+        holder.binding.tvChallengeProgressText.text = progressText
+        
         val iconResId = when (item.fieldType) {
-            "spots" -> R.drawable.ic_new_spot // Replace with your actual icons
+            "spots" -> R.drawable.ic_new_spot
             "photos" -> R.drawable.ic_share_photo
             "reviews" -> R.drawable.ic_review_place
             else -> R.drawable.ic_challenge_placeholder
