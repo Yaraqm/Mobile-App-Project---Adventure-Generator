@@ -1,5 +1,10 @@
 package com.example.mobileproject.fragments
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,21 +14,29 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mobileproject.MainActivity
 import com.example.mobileproject.adapters.AdventureAdapter
 import com.example.mobileproject.databinding.FragmentHomeBinding
 import com.example.mobileproject.models.Adventure
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.mobileproject.adapters.AdventureListItem
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), SensorEventListener {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private var categories: List<String> = emptyList()
 
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var lastShakeTime: Long = 0
+    private var lastX: Float = 0.0f
+    private var lastY: Float = 0.0f
+    private var lastZ: Float = 0.0f
+    private var isFirstReading = true
+
     private val adventureAdapter = AdventureAdapter { adventure ->
-        // Handle a click on any adventure item
         Toast.makeText(context, "${adventure.name} clicked!", Toast.LENGTH_SHORT).show()
     }
     private val firestore by lazy { FirebaseFirestore.getInstance() }
@@ -43,23 +56,38 @@ class HomeFragment : Fragment() {
         setupSpinButton()
         setupAdventureGeneratorButton()
 
-        // Add listener to hide the popup when the background is clicked
+        sensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
         binding.scrim.setOnClickListener {
             binding.adventurePopupContainer.isVisible = false
         }
 
         if (categories.isNotEmpty()) {
-            Log.d("HomeFragment", "View recreated. Repopulating wheel with existing data.")
             binding.luckyWheelView.setData(categories)
         }
     }
 
     override fun onResume() {
         super.onResume()
+        // --- My change: Show temperature card ---
+        (requireActivity() as MainActivity).temperatureCard.visibility = View.VISIBLE
+
         if (categories.isEmpty()) {
-            Log.d("HomeFragment", "Categories are empty. Fetching from network.")
             fetchCategoriesAndSetupWheel()
         }
+        accelerometer?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
+        }
+        isFirstReading = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // --- My change: Hide temperature card ---
+        (requireActivity() as MainActivity).temperatureCard.visibility = View.GONE
+
+        sensorManager.unregisterListener(this)
     }
 
     private fun setupRecyclerView() {
@@ -76,7 +104,7 @@ class HomeFragment : Fragment() {
         firestore.collection("locations")
             .get().addOnSuccessListener { documents ->
                 binding.wheelProgressBar.isVisible = false
-                if (documents.isEmpty) {
+                if (documents.isEmpty()) {
                     Toast.makeText(context, "No locations found in database.", Toast.LENGTH_LONG).show()
                     return@addOnSuccessListener
                 }
@@ -89,7 +117,6 @@ class HomeFragment : Fragment() {
                 this.categories = uniqueCategories.sorted()
 
                 if (categories.isNotEmpty()) {
-                    Log.d("HomeFragment", "Final categories loaded for wheel: $categories")
                     binding.luckyWheelView.setData(categories)
                     enableButtons()
                 } else {
@@ -111,23 +138,15 @@ class HomeFragment : Fragment() {
             }
 
             disableButtons()
-            // --- Hide the main popup container to clear previous results ---
             binding.adventurePopupContainer.isVisible = false
             adventureAdapter.submitList(emptyList())
 
             val targetIndex = (0 until categories.size).random()
 
             binding.luckyWheelView.rotateWheelTo(targetIndex) {
-                // This block runs AFTER the wheel stops
                 val selectedCategory = categories[targetIndex]
-
-                // Set the text for the result card (which is now inside the popup)
                 binding.resultText.text = "✨ Adventure awaits in: $selectedCategory ✨"
-
-                // Fetch the location, which will show the recycler view part of the popup
                 fetchLocationsForCategory(selectedCategory)
-
-                // The buttons are re-enabled inside fetchLocationsForCategory
             }
         }
     }
@@ -137,20 +156,16 @@ class HomeFragment : Fragment() {
             .whereEqualTo("category", category)
             .get()
             .addOnSuccessListener { documents ->
-                // This card with the text should only show up for the spin result
                 binding.resultContainer.isVisible = true
 
-                if (documents.isEmpty) {
+                if (documents.isEmpty()) {
                     Toast.makeText(context, "No locations found for '$category'", Toast.LENGTH_SHORT).show()
                 } else {
                     val locationsList = documents.toObjects(Adventure::class.java)
                     val randomLocation = locationsList.random()
                     val singleItem = AdventureListItem.SingleLocation(randomLocation)
-
-                    // Populate the adapter with the single random location
                     adventureAdapter.submitList(listOf(singleItem))
                 }
-                // Show the entire popup container now
                 binding.adventurePopupContainer.isVisible = true
                 enableButtons()
             }
@@ -169,18 +184,16 @@ class HomeFragment : Fragment() {
 
     private fun generateAdventureDay() {
         disableButtons()
-        // --- Hide the main popup container to clear previous results ---
         binding.adventurePopupContainer.isVisible = false
         adventureAdapter.submitList(emptyList())
 
-        // Make sure the "Adventure awaits in..." text card is hidden for this case
         binding.resultContainer.isVisible = false
 
         val locationsCollection = firestore.collection("locations")
 
         locationsCollection.whereEqualTo("category", "Food & Drink").get()
             .addOnSuccessListener { foodDocuments ->
-                if (foodDocuments.isEmpty) {
+                if (foodDocuments.isEmpty()) {
                     Toast.makeText(context, "No 'Food & Drink' locations found.", Toast.LENGTH_SHORT).show()
                     enableButtons()
                     return@addOnSuccessListener
@@ -197,7 +210,7 @@ class HomeFragment : Fragment() {
 
                 locationsCollection.whereEqualTo("category", randomActivityCategory).get()
                     .addOnSuccessListener { activityDocuments ->
-                        if (activityDocuments.isEmpty) {
+                        if (activityDocuments.isEmpty()) {
                             Toast.makeText(context, "Could not find a location for the activity.", Toast.LENGTH_SHORT).show()
                             enableButtons()
                             return@addOnSuccessListener
@@ -207,7 +220,6 @@ class HomeFragment : Fragment() {
                         val adventureDayItem = AdventureListItem.AdventureDay(randomFoodLocation, randomActivityLocation)
                         adventureAdapter.submitList(listOf(adventureDayItem))
 
-                        // Show the popup container
                         binding.adventurePopupContainer.isVisible = true
                         enableButtons()
                     }
@@ -227,8 +239,6 @@ class HomeFragment : Fragment() {
         binding.generateAdventureButton.isEnabled = true
     }
 
-
-
     private fun disableButtons() {
         binding.spinButton.isEnabled = false
         binding.generateAdventureButton.isEnabled = false
@@ -238,5 +248,44 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-}
 
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
+            handleShake(event)
+        }
+    }
+
+    private fun handleShake(event: SensorEvent) {
+        val currentTime = System.currentTimeMillis()
+        if ((currentTime - lastShakeTime) > 500) { // Debounce shakes
+            val x = event.values[0]
+            val y = event.values[1]
+            val z = event.values[2]
+
+            if (!isFirstReading) {
+                val deltaX = Math.abs(lastX - x)
+                val deltaY = Math.abs(lastY - y)
+                val deltaZ = Math.abs(lastZ - z)
+
+                val shakeThreshold = 10f
+
+                if (deltaX > shakeThreshold || deltaY > shakeThreshold || deltaZ > shakeThreshold) {
+                    if (binding.spinButton.isEnabled) {
+                        lastShakeTime = currentTime
+                        Log.d("HomeFragment", "Shake detected! Spinning the wheel.")
+                        binding.spinButton.performClick()
+                    }
+                }
+            }
+
+            lastX = x
+            lastY = y
+            lastZ = z
+            isFirstReading = false
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Not needed for this implementation
+    }
+}
