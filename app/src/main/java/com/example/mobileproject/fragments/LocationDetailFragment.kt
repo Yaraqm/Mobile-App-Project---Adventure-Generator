@@ -11,6 +11,7 @@ import android.widget.RatingBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager // <<< --- NEW IMPORT
 import com.example.mobileproject.R
@@ -68,6 +69,9 @@ class LocationDetailFragment : Fragment() {
         }
         binding.btnLeaveReview.setOnClickListener {
             showLeaveReviewDialog()
+        }
+        binding.btnBack.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 

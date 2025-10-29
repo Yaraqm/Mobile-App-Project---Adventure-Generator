@@ -7,15 +7,28 @@
     android:padding="16dp"
     tools:context=".fragments.LocationDetailFragment">
 
+    <!-- Back Button -->
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Location Name -->
     <TextView
         android:id="@+id/text_location_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back"
         tools:text="Regal Oshawa Centre" />
 
     <!-- Location Category -->
@@ -23,7 +36,7 @@
         android:id="@+id/text_location_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/abc_dialog_material_background"
         android:paddingStart="8dp"
         android:paddingTop="4dp"
@@ -53,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/text_location_description">
+        app:layout_constraintTop_toBottomOf="@+id/text_location_description">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddFavorite"
@@ -83,7 +96,7 @@
         android:text="Reviews"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttons_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/buttons_layout" />
 
     <!-- *** NEW: "Leave a Review" Button *** -->
     <com.google.android.material.button.MaterialButton
@@ -106,7 +119,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_reviews_title"
+        app:layout_constraintTop_toBottomOf="@+id/text_reviews_title"
         tools:listitem="@layout/item_review" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
