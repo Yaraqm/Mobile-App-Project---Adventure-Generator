@@ -11,13 +11,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.mobileproject.LoginActivity
 import com.example.mobileproject.R
+import com.example.mobileproject.adapters.FavoriteSpotAdapter
 import com.example.mobileproject.adapters.PhotoAdapter
 import com.example.mobileproject.databinding.FragmentProfileBinding
+import com.example.mobileproject.models.FavoriteSpot
 import com.example.mobileproject.models.Photo
 import com.example.mobileproject.utils.SupabaseHelper
+import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -27,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.util.Log
 import android.content.pm.PackageManager
+import com.google.firebase.firestore.FirebaseFirestoreException
 import io.github.jan.supabase.storage.storage
 
 class ProfileFragment : Fragment() {
@@ -39,6 +44,9 @@ class ProfileFragment : Fragment() {
 
     private val photos = mutableListOf<Photo>()
     private lateinit var photoAdapter: PhotoAdapter
+
+    private val favoriteSpots = mutableListOf<FavoriteSpot>()
+    private lateinit var favoriteSpotAdapter: FavoriteSpotAdapter
 
     private val PICK_IMAGE_REQUEST = 1001
 
@@ -57,20 +65,26 @@ class ProfileFragment : Fragment() {
         db = FirebaseFirestore.getInstance()
         SupabaseHelper.logConnection()
 
-        // RecyclerView setup
+        // RecyclerView setup for Photos
         photoAdapter = PhotoAdapter(photos) { selectedPhoto ->
             val dialog = ImagePreviewDialogFragment.newInstance(selectedPhoto.imageUrl)
-            dialog.setOnDeleteClicked {
-                deletePhoto(selectedPhoto)
-            }
+            dialog.setOnDeleteClicked { deletePhoto(selectedPhoto) }
             dialog.show(parentFragmentManager, "ImagePreviewDialog")
         }
 
+        // RecyclerView setup for Favorites
+        favoriteSpotAdapter = FavoriteSpotAdapter(favoriteSpots)
+
+        // Default to photos tab
         binding.profileRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.profileRecyclerView.adapter = photoAdapter
+        binding.btnUploadPhoto.visibility = View.VISIBLE
 
         loadUserProfile()
         loadUserPhotos()
+        loadUserReviewCount()
+
+        setupTabs()
 
         binding.logoutButton.setOnClickListener {
             auth.signOut()
@@ -78,10 +92,8 @@ class ProfileFragment : Fragment() {
             requireActivity().finish()
         }
 
-
         // ░░░ UPLOAD PHOTO FAB ░░░
         binding.btnUploadPhoto.setOnClickListener {
-            // ✅ Request runtime permission before picker
             if (requireContext().checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)
                 != PackageManager.PERMISSION_GRANTED
             ) {
@@ -92,7 +104,61 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    // ✅ Handle permission result
+    private fun setupTabs() {
+        binding.profileTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> {
+                        // 📸 Pictures tab selected
+                        binding.profileRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                        binding.profileRecyclerView.adapter = photoAdapter
+                        loadUserPhotos()
+                        binding.btnUploadPhoto.visibility = View.VISIBLE // show FAB
+                    }
+                    1 -> {
+                        // ⭐ Favorites tab selected
+                        binding.profileRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                        binding.profileRecyclerView.adapter = favoriteSpotAdapter
+                        loadFavoriteSpots()
+                        binding.btnUploadPhoto.visibility = View.GONE // hide FAB
+                    }
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    private fun loadFavoriteSpots() {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { userDoc ->
+                if (userDoc != null && userDoc.exists()) {
+                    val favoritedLocationIds = userDoc.get("favorited_locations") as? List<String> ?: listOf()
+                    favoriteSpots.clear()
+
+                    if (favoritedLocationIds.isEmpty()) {
+                        favoriteSpotAdapter.notifyDataSetChanged()
+                        return@addOnSuccessListener
+                    }
+
+                    for (locationId in favoritedLocationIds) {
+                        db.collection("locations").document(locationId).get()
+                            .addOnSuccessListener { locationDoc ->
+                                if (locationDoc != null && locationDoc.exists()) {
+                                    val name = locationDoc.getString("name")?.trim()?.replace("\n", "") ?: "Unknown Spot"
+                                    val city = locationDoc.getString("city")?.trim() ?: "Unknown City"
+                                    favoriteSpots.add(FavoriteSpot(locationId, name, city))
+                                    favoriteSpotAdapter.notifyDataSetChanged()
+                                }
+                            }
+                    }
+                }
+            }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -120,12 +186,13 @@ class ProfileFragment : Fragment() {
                     val points = document.getLong("points") ?: 0
                     val joinedAt = document.getTimestamp("joinedAt")
                     val bio = document.getString("bio") ?: ""
+                    val visitedLocations = document.get("visited_locations") as? List<*>
+                    val visitedCount = visitedLocations?.size ?: 0
 
+                    binding.userSpotsCount.text = visitedCount.toString()
                     binding.userName.text = name
                     binding.userEmail.text = email
                     binding.userPoints.text = "$points"
-
-                    // Bio text
                     binding.userBio.text = if (bio.isNotBlank()) bio else "Tap to add a short bio..."
 
                     joinedAt?.let {
@@ -143,12 +210,24 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
             }
 
-        // ✅ Set up tap-to-edit behavior
-        binding.userBio.setOnClickListener {
-            showEditBioDialog()
-        }
+        binding.userBio.setOnClickListener { showEditBioDialog() }
     }
 
+    private fun loadUserReviewCount() {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collectionGroup("reviews").whereEqualTo("userId", userId).get()
+            .addOnSuccessListener { documents ->
+                Log.d("ProfileFragment", "Review count query successful, found ${documents.size()} reviews.")
+                binding.userReviewsCount.text = documents.size().toString()
+            }
+            .addOnFailureListener { e ->
+                Log.e("ProfileFragment", "Error getting review count", e)
+                if (e is FirebaseFirestoreException && e.code == FirebaseFirestoreException.Code.FAILED_PRECONDITION) {
+                    Toast.makeText(requireContext(), "Query requires an index. Check Logcat for a link to create it.", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -268,7 +347,6 @@ class ProfileFragment : Fragment() {
             .setPositiveButton("Save") { dialog, _ ->
                 val newBio = input.text.toString().trim()
 
-                // Update Firestore dynamically
                 db.collection("users").document(userId)
                     .update("bio", newBio)
                     .addOnSuccessListener {
@@ -285,19 +363,15 @@ class ProfileFragment : Fragment() {
             .show()
     }
 
-
     private fun deletePhoto(photo: Photo) {
         val userId = auth.currentUser?.uid ?: return
         lifecycleScope.launch {
             try {
-                // 1️⃣ Extract the correct path (before any query params)
                 val fullUrl = photo.imageUrl
-                val baseFileName = fullUrl.substringBeforeLast("?").substringAfterLast("/") // gives userId_uuid.jpg
+                val baseFileName = fullUrl.substringBeforeLast("?").substringAfterLast("/")
 
-                // 2️⃣ Delete from Supabase
                 SupabaseHelper.deleteFile("user_photos", baseFileName)
 
-                // 3️⃣ Delete from Firestore
                 db.collection("users").document(userId)
                     .collection("photos")
                     .whereEqualTo("path", baseFileName)
@@ -310,7 +384,6 @@ class ProfileFragment : Fragment() {
                         Toast.makeText(requireContext(), "Firestore delete failed: ${it.message}", Toast.LENGTH_SHORT).show()
                     }
 
-                // 4️⃣ Update locally
                 val index = photos.indexOf(photo)
                 if (index != -1) {
                     photos.removeAt(index)
@@ -323,12 +396,8 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-
-
-
