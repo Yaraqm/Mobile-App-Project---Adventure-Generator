@@ -31,6 +31,7 @@
             android:layout_marginStart="16dp"
             android:text="Temperature message goes here..." />
 
+        <!-- Image View for Music ON/OFF within Temperature Sensor Message Box -->
         <ImageView
             android:id="@+id/musicIcon"
             android:layout_width="30dp"

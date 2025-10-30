@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         tempSensor?.let {
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
         }
+        myApp.startMusicIfOn()
     }
 
     override fun onPause() {

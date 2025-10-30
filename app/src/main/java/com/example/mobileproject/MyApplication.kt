@@ -36,7 +36,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
         SupabaseHelper.logConnection()
 
         // Prepare MediaPlayer
-        mediaPlayer = MediaPlayer.create(this, R.raw.backgroundaudio)
+        mediaPlayer = MediaPlayer.create(this, R.raw.backgroundmusic)
         mediaPlayer?.isLooping = true
     }
 
@@ -65,8 +65,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
 
     override fun onActivityStarted(activity: Activity) {
         if (startedActivities == 0) {
-            // App came to foreground
-            startMusicIfOn()
+            startMusicIfOn() // If app comes to foreground, keep music on loop unless muted
         }
         startedActivities++
     }
@@ -78,8 +77,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
     override fun onActivityStopped(activity: Activity) {
         startedActivities--
         if (startedActivities == 0) {
-            // App went to background
-            pauseMusic()
+            pauseMusic() // If app goes to background, pause the music service
         }
     }
 
