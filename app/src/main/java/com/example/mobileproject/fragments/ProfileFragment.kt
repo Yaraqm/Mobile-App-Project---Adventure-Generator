@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 import android.util.Log
 import android.content.pm.PackageManager
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.ListenerRegistration
 import io.github.jan.supabase.storage.storage
 
 class ProfileFragment : Fragment() {
@@ -83,6 +85,7 @@ class ProfileFragment : Fragment() {
         loadUserProfile()
         loadUserPhotos()
         loadUserReviewCount()
+        loadUserFriendCount()
 
         setupTabs()
 
@@ -90,6 +93,10 @@ class ProfileFragment : Fragment() {
             auth.signOut()
             startActivity(Intent(requireContext(), LoginActivity::class.java))
             requireActivity().finish()
+        }
+
+        binding.friendsStatLayout.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_friendsFragment)
         }
 
         // ░░░ UPLOAD PHOTO FAB ░░░
@@ -158,6 +165,34 @@ class ProfileFragment : Fragment() {
                 }
             }
     }
+
+    private var friendCountListener: ListenerRegistration? = null
+
+    private fun loadUserFriendCount() {
+        val userId = auth.currentUser?.uid ?: return
+
+        // Remove any old listener
+        friendCountListener?.remove()
+
+        // Attach Firestore listener
+        friendCountListener = db.collection("users")
+            .document(userId)
+            .collection("friends")
+            .whereEqualTo("status", "accepted")
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Log.w("ProfileFragment", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                val count = snapshots?.documents?.size ?: 0
+                if (_binding != null) { // ensure view still exists
+                    binding.userFriendsCount.text = count.toString()
+                }
+            }
+    }
+
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -398,6 +433,9 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        friendCountListener?.remove()
+        friendCountListener = null
         _binding = null
     }
+
 }

@@ -14,7 +14,6 @@
         android:id="@+id/nav_map"
         android:name="com.example.mobileproject.fragments.MapFragment"
         android:label="@string/nav_map" >
-        <!-- THIS IS THE NEW ACTION THAT'S BEEN ADDED -->
         <action
             android:id="@+id/action_mapFragment_to_locationDetailFragment"
             app:destination="@id/locationDetailFragment" />
@@ -37,7 +36,11 @@
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.mobileproject.fragments.ProfileFragment"
-        android:label="@string/nav_profile" />
+        android:label="@string/nav_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_friendsFragment"
+            app:destination="@id/nav_friends" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_rewards_store"
@@ -45,7 +48,6 @@
         android:label="Rewards Store"
         tools:layout="@layout/fragment_rewards_store" />
 
-    <!-- THIS IS THE NEW FRAGMENT DESTINATION THAT'S BEEN ADDED -->
     <fragment
         android:id="@+id/locationDetailFragment"
         android:name="com.example.mobileproject.fragments.LocationDetailFragment"
@@ -55,5 +57,11 @@
             android:name="locationId"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_friends"
+        android:name="com.example.mobileproject.fragments.FriendsFragment"
+        android:label="Friends"
+        tools:layout="@layout/fragment_friends" />
 
 </navigation>

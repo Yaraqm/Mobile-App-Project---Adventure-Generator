@@ -37,6 +37,23 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         binding.bottomNavigation.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.nav_home,
+                R.id.nav_map,
+                R.id.nav_add_spot,
+                R.id.nav_rewards,
+                R.id.nav_profile -> {
+                    supportActionBar?.hide()
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                }
+                else -> {
+                    supportActionBar?.show()
+                    binding.bottomNavigation.visibility = View.GONE
+                }
+            }
+        }
+
         temperatureCard = findViewById(R.id.temperatureCard)
         temperatureMessage = findViewById(R.id.temperatureMessage)
         musicIcon = findViewById(R.id.musicIcon)
@@ -95,5 +112,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         if (tempSensor == null) { // Ensure it's hidden if sensor is not found
             temperatureCard.visibility = View.GONE
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
