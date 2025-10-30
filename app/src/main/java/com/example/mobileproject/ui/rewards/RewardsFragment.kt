@@ -32,8 +32,8 @@ class RewardsFragment : Fragment() {
     private var userListener: ListenerRegistration? = null
     private var challengesListener: ListenerRegistration? = null
     private var photosListener: ListenerRegistration? = null
-    private var reviewsListener: ListenerRegistration? = null // Added for future use
-    private var spotsVisitedListener: ListenerRegistration? = null // Added for future use
+    private var reviewsListener: ListenerRegistration? = null
+    private var spotsVisitedListener: ListenerRegistration? = null
 
 
     override fun onCreateView(
@@ -55,7 +55,7 @@ class RewardsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        loadAllData()
+        loadChallenges()
     }
 
     override fun onStop() {
@@ -77,16 +77,8 @@ class RewardsFragment : Fragment() {
         binding.recyclerBadges.adapter = badgeAdapter
     }
 
-    private fun loadAllData() {
-        if (userId == null) {
-            Log.e("RewardsFragment", "User not logged in.")
-            return
-        }
-        loadUserData(userId)
-        loadChallenges(userId)
-    }
-
     private fun loadUserData(userId: String) {
+        userListener?.remove() // Avoid multiple listeners
         userListener = firestore.collection("users").document(userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -95,17 +87,8 @@ class RewardsFragment : Fragment() {
                 }
                 if (snapshot != null && snapshot.exists()) {
                     val points = snapshot.getLong("points") ?: 0L
-                    // Static values from the document
-                    val reviewsWritten = snapshot.getLong("reviewsWritten") ?: 0L
-                    val spotsVisited = snapshot.getLong("spotsVisited") ?: 0L
-
                     binding.tvTotalPoints.text = NumberFormat.getNumberInstance(Locale.US).format(points)
                     badgeAdapter.updateUserPoints(points.toInt())
-
-                    // Set static text views
-                    binding.tvReviewsWritten.text = reviewsWritten.toString()
-                    binding.tvSpotsVisited.text = spotsVisited.toString()
-                    updateContributorScore() // Calculate score
 
                     val level = (points / 1000).toInt() + 1
                     val pointsForCurrentLevel = (level - 1) * 1000
@@ -118,8 +101,7 @@ class RewardsFragment : Fragment() {
                     binding.levelProgressBar.progress = progressPercentage
                     binding.tvPointsToNextLevel.text = "${pointsForNextLevel - points} points to Level ${level + 1}"
 
-                    val completions = snapshot.get("photoChallengeCompletions") as? Long ?: 0L
-                    listenToPhotoChallengeProgress(userId, completions.toInt())
+                    // Challenge progress listeners are now initiated after challenges are loaded
                 }
             }
     }
@@ -133,8 +115,13 @@ class RewardsFragment : Fragment() {
         binding.tvContributorScore.text = contributorScore.toString()
     }
 
+    private fun loadChallenges() {
+        if (userId == null) {
+            Log.e("RewardsFragment", "User not logged in, cannot load challenges.")
+            return
+        }
 
-    private fun loadChallenges(userId: String) {
+        challengesListener?.remove()
         challengesListener = firestore.collection("challenges")
             .whereEqualTo("active", true)
             .addSnapshotListener { snapshot, error ->
@@ -145,9 +132,30 @@ class RewardsFragment : Fragment() {
                 val challenges = snapshot?.documents?.mapNotNull {
                     it.toObject(Challenge::class.java)?.copy(id = it.id)
                 } ?: emptyList()
+
                 challengeAdapter.submitList(challenges)
+
+                // Once challenges are loaded, load user data and start progress listeners
+                loadUserData(userId)
+                startAllChallengeListeners(userId)
             }
     }
+
+    private fun startAllChallengeListeners(userId: String) {
+        firestore.collection("users").document(userId).get().addOnSuccessListener { userDoc ->
+            if (userDoc != null && userDoc.exists()) {
+                val photoCompletions = userDoc.getLong("photoChallengeCompletions")?.toInt() ?: 0
+                listenToPhotoChallengeProgress(userId, photoCompletions)
+
+                val reviewsCompletions = userDoc.getLong("reviewsChallengeCompletions")?.toInt() ?: 0
+                listenToReviewsProgress(userId, reviewsCompletions)
+
+                val spotsCompletions = userDoc.getLong("spotsChallengeCompletions")?.toInt() ?: 0
+                listenToSpotsVisitedProgress(userId, spotsCompletions)
+            }
+        }
+    }
+
 
     private fun listenToPhotoChallengeProgress(userId: String, completions: Int) {
         photosListener?.remove()
@@ -159,35 +167,84 @@ class RewardsFragment : Fragment() {
                 }
 
                 val photoCount = photosSnapshot?.size() ?: 0
-                challengeAdapter.updatePhotoChallengeProgress("photos", photoCount, completions)
+                challengeAdapter.updateChallengeProgress("photos", photoCount, completions)
                 binding.tvPhotosAdded.text = photoCount.toString()
-
                 updateContributorScore()
 
                 val photoChallenge = challengeAdapter.getChallengeByType("photos") ?: return@addSnapshotListener
+                if (photoChallenge.goal <= 0) return@addSnapshotListener
 
                 val newCompletions = photoCount / photoChallenge.goal
-
                 if (newCompletions > completions) {
                     val completionsToAward = newCompletions - completions
-                    awardPointsForPhotoChallenge(userId, photoChallenge, completionsToAward, newCompletions)
+                    awardPointsForChallenge(userId, photoChallenge, "photoChallengeCompletions", completionsToAward, newCompletions)
                 }
             }
     }
 
+    private fun listenToReviewsProgress(userId: String, completions: Int) {
+        val reviewsChallenge = challengeAdapter.getChallengeByType("reviews") ?: return
+        if (reviewsChallenge.goal <= 0) return
 
-    private fun awardPointsForPhotoChallenge(userId: String, challenge: Challenge, completionsToAward: Int, totalCompletions: Int) {
+        reviewsListener?.remove()
+        reviewsListener = firestore.collectionGroup("reviews").whereEqualTo("userId", userId)
+            .addSnapshotListener { reviewsSnapshot, error ->
+                if (error != null) {
+                    Log.w("RewardsFragment", "Listen failed for reviews.", error)
+                    return@addSnapshotListener
+                }
+
+                val reviewsCount = reviewsSnapshot?.size() ?: 0
+                challengeAdapter.updateChallengeProgress("reviews", reviewsCount, completions)
+                binding.tvReviewsWritten.text = reviewsCount.toString()
+                updateContributorScore()
+
+                val newCompletions = reviewsCount / reviewsChallenge.goal
+                if (newCompletions > completions) {
+                    val completionsToAward = newCompletions - completions
+                    awardPointsForChallenge(userId, reviewsChallenge, "reviewsChallengeCompletions", completionsToAward, newCompletions)
+                }
+            }
+    }
+
+    private fun listenToSpotsVisitedProgress(userId: String, completions: Int) {
+        val spotsChallenge = challengeAdapter.getChallengeByType("spots") ?: return
+        if (spotsChallenge.goal <= 0) return
+
+        spotsVisitedListener?.remove()
+        spotsVisitedListener = firestore.collection("users").document(userId)
+            .addSnapshotListener { userSnapshot, error ->
+                if (error != null) {
+                    Log.w("RewardsFragment", "Listen failed for spots visited.", error)
+                    return@addSnapshotListener
+                }
+
+                val visitedLocations = userSnapshot?.get("visited_locations") as? List<*>
+                val spotsCount = visitedLocations?.size ?: 0
+                challengeAdapter.updateChallengeProgress("spots", spotsCount, completions)
+                binding.tvSpotsVisited.text = spotsCount.toString()
+                updateContributorScore()
+
+                val newCompletions = spotsCount / spotsChallenge.goal
+                if (newCompletions > completions) {
+                    val completionsToAward = newCompletions - completions
+                    awardPointsForChallenge(userId, spotsChallenge, "spotsChallengeCompletions", completionsToAward, newCompletions)
+                }
+            }
+    }
+
+    private fun awardPointsForChallenge(userId: String, challenge: Challenge, completionField: String, completionsToAward: Int, totalCompletions: Int) {
         val userRef = firestore.collection("users").document(userId)
         val pointsToAward = challenge.points * completionsToAward
 
         firestore.runTransaction { transaction ->
             transaction.update(userRef, "points", FieldValue.increment(pointsToAward.toLong()))
-            transaction.update(userRef, "photoChallengeCompletions", totalCompletions)
+            transaction.update(userRef, completionField, totalCompletions.toLong())
             null
         }.addOnSuccessListener {
-            Log.d("RewardsFragment", "Awarded $pointsToAward points for $completionsToAward photo challenge completions.")
+            Log.d("RewardsFragment", "Awarded $pointsToAward points for $completionsToAward ${challenge.fieldType} challenge completions.")
         }.addOnFailureListener {
-            Log.e("RewardsFragment", "Failed to award points for photo challenge", it)
+            Log.e("RewardsFragment", "Failed to award points for ${challenge.fieldType} challenge", it)
         }
     }
 

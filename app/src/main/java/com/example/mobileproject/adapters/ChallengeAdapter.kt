@@ -32,15 +32,7 @@ class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHold
         return items.find { it.fieldType == type }
     }
 
-    fun updateChallengeProgress(fieldType: String, currentProgress: Int) {
-        val challengeIndex = items.indexOfFirst { it.fieldType == fieldType }
-        if (challengeIndex != -1) {
-            items[challengeIndex].progress = currentProgress
-            notifyItemChanged(challengeIndex)
-        }
-    }
-
-    fun updatePhotoChallengeProgress(fieldType: String, currentProgress: Int, completions: Int) {
+    fun updateChallengeProgress(fieldType: String, currentProgress: Int, completions: Int) {
         val challengeIndex = items.indexOfFirst { it.fieldType == fieldType }
         if (challengeIndex != -1) {
             val challenge = items[challengeIndex]
@@ -67,11 +59,11 @@ class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHold
 
         var displayProgress = item.progress
         var displayGoal = item.goal
-        
-        if (item.fieldType == "photos") {
+
+        if (item.goal > 0) { // Avoid division by zero
             displayGoal = item.goal * (item.completions + 1)
         }
-        
+
         val progressPercentage = if (displayGoal > 0) (displayProgress * 100 / displayGoal).coerceAtMost(100) else 0
         holder.binding.progressChallenge.progress = progressPercentage
 
@@ -81,10 +73,10 @@ class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHold
             "reviews" -> "Reviews"
             else -> ""
         }
-        
+
         val progressText = if (unit.isNotEmpty()) "$displayProgress/$displayGoal $unit" else "$displayProgress/$displayGoal"
         holder.binding.tvChallengeProgressText.text = progressText
-        
+
         val iconResId = when (item.fieldType) {
             "spots" -> R.drawable.ic_new_spot
             "photos" -> R.drawable.ic_share_photo
