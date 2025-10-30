@@ -31,6 +31,12 @@
             android:layout_marginStart="16dp"
             android:text="Temperature message goes here..." />
 
+        <ImageView
+            android:id="@+id/musicIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_music" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

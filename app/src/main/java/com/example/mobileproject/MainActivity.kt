@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -20,8 +21,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var tempSensor: Sensor? = null
 
-    lateinit var temperatureCard: CardView // Public for fragments
+    lateinit var temperatureCard: CardView
     private lateinit var temperatureMessage: TextView
+    private lateinit var musicIcon: ImageView
+    private val myApp by lazy { application as MyApplication }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +39,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         temperatureCard = findViewById(R.id.temperatureCard)
         temperatureMessage = findViewById(R.id.temperatureMessage)
+        musicIcon = findViewById(R.id.musicIcon)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
 
-        // My Change: Hide the card by default.
         temperatureCard.visibility = View.GONE
+
+        musicIcon.setOnClickListener {
+            myApp.toggleMusic()
+            updateMusicIcon()
+        }
+        updateMusicIcon()
     }
 
     override fun onResume() {
@@ -54,6 +63,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(this)
+    }
+
+    private fun updateMusicIcon() {
+        val iconRes = if (myApp.isMusicOn) R.drawable.ic_music else R.drawable.ic_music_off
+        musicIcon.setImageResource(iconRes)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
