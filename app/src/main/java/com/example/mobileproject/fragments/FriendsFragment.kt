@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.mobileproject.R
 import com.example.mobileproject.adapters.FriendsAdapter
 import com.example.mobileproject.databinding.FragmentFriendsBinding
 import com.example.mobileproject.models.Friend
@@ -55,12 +54,10 @@ class FriendsFragment : Fragment() {
         loadFriendsAndRequests()
     }
 
-    /* ░░░ BACK BUTTON HANDLER ░░░ */
     private fun setupBackButton() {
         binding.btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
-    /* ░░░ RECYCLERS ░░░ */
     private fun setupRecyclerViews() {
         friendsAdapter = FriendsAdapter(
             friendsList,
@@ -93,16 +90,15 @@ class FriendsFragment : Fragment() {
             .addSnapshotListener { snapshot, e ->
                 if (e != null || snapshot == null) return@addSnapshotListener
 
-                requestsList.clear()
-                friendsList.clear()
-                outgoingRequests.clear()
+                // Use temp lists to avoid flicker
+                val newFriends = mutableListOf<Friend>()
+                val newRequests = mutableListOf<Friend>()
+                val newOutgoing = mutableListOf<Friend>()
 
                 snapshot.documents.forEach { doc ->
                     val friendId = doc.id
-                    val statusString = doc.getString("status") ?: return@forEach
-
-                    // Prevent self references or bad entries
                     if (friendId == currentUserUid) return@forEach
+                    val statusString = doc.getString("status") ?: return@forEach
 
                     val status = when (statusString) {
                         "accepted" -> FriendshipStatus.FRIENDS
@@ -117,12 +113,19 @@ class FriendsFragment : Fragment() {
                                 ?.copy(uid = friendId, status = status)
                             if (friend != null) {
                                 when (status) {
-                                    FriendshipStatus.FRIENDS -> friendsList.add(friend)
-                                    FriendshipStatus.PENDING_INCOMING -> requestsList.add(friend)
-                                    FriendshipStatus.PENDING_OUTGOING -> outgoingRequests.add(friend)
+                                    FriendshipStatus.FRIENDS -> newFriends.add(friend)
+                                    FriendshipStatus.PENDING_INCOMING -> newRequests.add(friend)
+                                    FriendshipStatus.PENDING_OUTGOING -> newOutgoing.add(friend)
                                     else -> {}
                                 }
-                                if (_binding != null) updateAdapters()
+
+                                // After all async reads finish, update lists
+                                if (userDoc != null && _binding != null) {
+                                    friendsList.clear(); friendsList.addAll(newFriends)
+                                    requestsList.clear(); requestsList.addAll(newRequests)
+                                    outgoingRequests.clear(); outgoingRequests.addAll(newOutgoing)
+                                    updateAdapters()
+                                }
                             }
                         }
                 }
@@ -163,94 +166,81 @@ class FriendsFragment : Fragment() {
                 for (doc in documents) {
                     val user = doc.toObject(Friend::class.java).copy(uid = doc.id)
                     if (user.uid == currentUserUid) continue
-
                     val nameLc = (user.name ?: "").lowercase(Locale.getDefault())
-                    if (nameLc.startsWith(q)) {
 
-                        // ✅ Safer Firestore check for stale "requested" states
-                        val userStatus = when {
+                    if (nameLc.startsWith(q)) {
+                        val status = when {
                             friendsList.any { it.uid == user.uid } -> FriendshipStatus.FRIENDS
                             requestsList.any { it.uid == user.uid } -> FriendshipStatus.PENDING_INCOMING
                             outgoingRequests.any { it.uid == user.uid } -> FriendshipStatus.PENDING_OUTGOING
                             else -> FriendshipStatus.NOT_FRIENDS
                         }
-
-                        user.status = userStatus
+                        user.status = status
                         searchResults.add(user)
                     }
                 }
-
-                // Clean pass to verify no false "Requested"
-                val checkedResults = mutableListOf<Friend>()
-                for (user in searchResults) {
-                    val docRef = db.collection("users")
-                        .document(currentUserUid)
-                        .collection("friends")
-                        .document(user.uid)
-                    docRef.get().addOnSuccessListener { doc ->
-                        if (doc.exists()) {
-                            val status = doc.getString("status")
-                            when (status) {
-                                "pending_outgoing" -> user.status = FriendshipStatus.PENDING_OUTGOING
-                                "pending_incoming" -> user.status = FriendshipStatus.PENDING_INCOMING
-                                "accepted" -> user.status = FriendshipStatus.FRIENDS
-                                else -> user.status = FriendshipStatus.NOT_FRIENDS
-                            }
-                        } else {
-                            user.status = FriendshipStatus.NOT_FRIENDS
-                        }
-                        friendsAdapter.notifyDataSetChanged()
-                    }
-                    checkedResults.add(user)
-                }
-
-                friendsAdapter.updateUsers(checkedResults)
+                friendsAdapter.updateUsers(searchResults)
             }
     }
 
     /* ░░░ FRIEND REQUEST HANDLERS ░░░ */
     private fun sendFriendRequest(user: Friend) {
         val currentUserUid = auth.currentUser?.uid ?: return
-        db.collection("users").document(currentUserUid)
+
+        // Batch both writes to keep atomic
+        val batch = db.batch()
+        val senderRef = db.collection("users").document(currentUserUid)
             .collection("friends").document(user.uid)
-            .set(mapOf("status" to "pending_outgoing"))
-
-        db.collection("users").document(user.uid)
+        val receiverRef = db.collection("users").document(user.uid)
             .collection("friends").document(currentUserUid)
-            .set(mapOf("status" to "pending_incoming"))
 
-        user.status = FriendshipStatus.PENDING_OUTGOING
-        outgoingRequests.add(user)
-        updateAdapters()
+        batch.set(senderRef, mapOf("status" to "pending_outgoing"))
+        batch.set(receiverRef, mapOf("status" to "pending_incoming"))
+        batch.commit().addOnSuccessListener {
+            user.status = FriendshipStatus.PENDING_OUTGOING
+            outgoingRequests.add(user)
+            updateAdapters()
+        }
     }
 
     private fun acceptFriendRequest(user: Friend) {
         val currentUserUid = auth.currentUser?.uid ?: return
-        db.collection("users").document(currentUserUid)
-            .collection("friends").document(user.uid)
-            .update("status", "accepted")
 
-        db.collection("users").document(user.uid)
+        val batch = db.batch()
+        val userRef = db.collection("users").document(currentUserUid)
+            .collection("friends").document(user.uid)
+        val otherRef = db.collection("users").document(user.uid)
             .collection("friends").document(currentUserUid)
-            .update("status", "accepted")
+
+        batch.update(userRef, "status", "accepted")
+        batch.update(otherRef, "status", "accepted")
+        batch.commit()
     }
 
     private fun rejectFriendRequest(user: Friend) {
         val currentUserUid = auth.currentUser?.uid ?: return
-        db.collection("users").document(currentUserUid)
-            .collection("friends").document(user.uid).delete()
+        val batch = db.batch()
+        val ref1 = db.collection("users").document(currentUserUid)
+            .collection("friends").document(user.uid)
+        val ref2 = db.collection("users").document(user.uid)
+            .collection("friends").document(currentUserUid)
 
-        db.collection("users").document(user.uid)
-            .collection("friends").document(currentUserUid).delete()
+        batch.delete(ref1)
+        batch.delete(ref2)
+        batch.commit()
     }
 
     private fun removeFriend(user: Friend) {
         val currentUserUid = auth.currentUser?.uid ?: return
-        db.collection("users").document(currentUserUid)
-            .collection("friends").document(user.uid).delete()
+        val batch = db.batch()
+        val ref1 = db.collection("users").document(currentUserUid)
+            .collection("friends").document(user.uid)
+        val ref2 = db.collection("users").document(user.uid)
+            .collection("friends").document(currentUserUid)
 
-        db.collection("users").document(user.uid)
-            .collection("friends").document(currentUserUid).delete()
+        batch.delete(ref1)
+        batch.delete(ref2)
+        batch.commit()
     }
 
     private fun updateAdapters() {
