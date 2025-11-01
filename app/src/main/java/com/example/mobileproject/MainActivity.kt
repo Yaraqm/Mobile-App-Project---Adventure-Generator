@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             when (destination.id) {
                 R.id.nav_home,
                 R.id.nav_map,
-                R.id.nav_add_spot,
                 R.id.nav_rewards,
                 R.id.nav_profile -> {
                     supportActionBar?.hide()

@@ -138,8 +138,8 @@ class HomeFragment : Fragment(), SensorEventListener {
             }
 
             disableButtons()
-            binding.adventurePopupContainer.isVisible = false
-            adventureAdapter.submitList(emptyList())
+            //binding.adventurePopupContainer.isVisible = false
+            //adventureAdapter.submitList(emptyList())
 
             val targetIndex = (0 until categories.size).random()
 
@@ -160,10 +160,13 @@ class HomeFragment : Fragment(), SensorEventListener {
 
                 if (documents.isEmpty()) {
                     Toast.makeText(context, "No locations found for '$category'", Toast.LENGTH_SHORT).show()
+                    adventureAdapter.submitList(emptyList()) // Clear the list if nothing is found
                 } else {
                     val locationsList = documents.toObjects(Adventure::class.java)
                     val randomLocation = locationsList.random()
                     val singleItem = AdventureListItem.SingleLocation(randomLocation)
+
+                    // This is the ideal place to clear and then submit
                     adventureAdapter.submitList(listOf(singleItem))
                 }
                 binding.adventurePopupContainer.isVisible = true
@@ -176,6 +179,7 @@ class HomeFragment : Fragment(), SensorEventListener {
             }
     }
 
+
     private fun setupAdventureGeneratorButton() {
         binding.generateAdventureButton.setOnClickListener {
             generateAdventureDay()
@@ -184,13 +188,11 @@ class HomeFragment : Fragment(), SensorEventListener {
 
     private fun generateAdventureDay() {
         disableButtons()
-        binding.adventurePopupContainer.isVisible = false
-        adventureAdapter.submitList(emptyList())
-
-        binding.resultContainer.isVisible = false
+        // The lines that hide the popup and clear the list have been removed from the start.
 
         val locationsCollection = firestore.collection("locations")
 
+        // First, get a random "Food & Drink" location
         locationsCollection.whereEqualTo("category", "Food & Drink").get()
             .addOnSuccessListener { foodDocuments ->
                 if (foodDocuments.isEmpty()) {
@@ -200,6 +202,7 @@ class HomeFragment : Fragment(), SensorEventListener {
                 }
                 val randomFoodLocation = foodDocuments.toObjects(Adventure::class.java).random()
 
+                // Then, get a random location from any other category
                 val otherCategories = categories.filter { it.equals("Food & Drink", ignoreCase = true).not() }
                 if (otherCategories.isEmpty()) {
                     Toast.makeText(context, "No other activity categories found.", Toast.LENGTH_SHORT).show()
@@ -217,10 +220,17 @@ class HomeFragment : Fragment(), SensorEventListener {
                         }
                         val randomActivityLocation = activityDocuments.toObjects(Adventure::class.java).random()
 
+                        // Create the combined adventure item
                         val adventureDayItem = AdventureListItem.AdventureDay(randomFoodLocation, randomActivityLocation)
-                        adventureAdapter.submitList(listOf(adventureDayItem))
 
+                        // --- This is the new, correct logic ---
+                        // 1. Clear the old adapter data and submit the new item
+                        adventureAdapter.submitList(listOf(adventureDayItem))
+                        // 2. Set the result text
+                        binding.resultText.text = "🎉 Your Full Day Adventure! 🎉"
+                        // 3. Make the entire popup container visible
                         binding.adventurePopupContainer.isVisible = true
+
                         enableButtons()
                     }
                     .addOnFailureListener {
