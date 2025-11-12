@@ -59,14 +59,27 @@
         app:layout_constraintTop_toBottomOf="@id/text_location_category"
         tools:text="Large multiplex cinema showing all the latest blockbuster movies. A great place to hang out with friends." />
 
+    <!-- *** NEW: "GET DIRECTIONS" BUTTON *** -->
+    <!-- This is the primary action button for navigation. -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_get_directions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Get Directions"
+        app:icon="@drawable/ic_directions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_location_description" />
+
     <!-- This LinearLayout contains the Favorite and Visited buttons -->
     <LinearLayout
         android:id="@+id/buttons_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/text_location_description">
+        app:layout_constraintTop_toBottomOf="@+id/btn_get_directions">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddFavorite"
@@ -98,7 +111,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttons_layout" />
 
-    <!-- *** NEW: "Leave a Review" Button *** -->
+    <!-- "Leave a Review" Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_leave_review"
         style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -110,7 +123,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/text_reviews_title" />
 
-    <!-- *** NEW: RecyclerView to display the list of reviews *** -->
+    <!-- RecyclerView to display the list of reviews -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reviews_recycler_view"
         android:layout_width="0dp"
