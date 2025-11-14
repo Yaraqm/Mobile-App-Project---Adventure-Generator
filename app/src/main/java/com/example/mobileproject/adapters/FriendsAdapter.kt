@@ -23,7 +23,8 @@ class FriendsAdapter(
 ) : RecyclerView.Adapter<FriendsAdapter.FriendViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_friend, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_friend, parent, false)
         return FriendViewHolder(view)
     }
 
@@ -35,7 +36,8 @@ class FriendsAdapter(
     override fun getItemCount() = users.size
 
     fun updateUsers(newUsers: List<Friend>) {
-        this.users = newUsers
+        // small safety: never show duplicate rows for same uid
+        this.users = newUsers.distinctBy { it.uid }
         notifyDataSetChanged()
     }
 
@@ -63,26 +65,56 @@ class FriendsAdapter(
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(avatar)
 
+            // 🔁 FULL RESET for recycled views
             requestButtons.visibility = View.GONE
             btnAddFriend.visibility = View.GONE
             friendStatusTag.visibility = View.GONE
+
+            itemView.setOnClickListener(null)           // clear old click listeners
+            itemView.setOnLongClickListener(null)
+
+            btnAddFriend.isEnabled = true               // re-enable in case a recycled view was disabled
+            btnAddFriend.text = "Add"
+            btnAddFriend.setBackgroundResource(R.drawable.bg_friend_add)
+            btnAddFriend.setTextColor(
+                itemView.resources.getColor(android.R.color.white, null)
+            )
 
             when (user.status) {
                 FriendshipStatus.FRIENDS -> {
                     friendStatusTag.visibility = View.VISIBLE
                     friendStatusTag.text = "Friend"
                     friendStatusTag.setBackgroundResource(R.drawable.bg_friend_tag_solid)
-                    itemView.setOnClickListener { onRemoveFriend(user) }
+
+                    // ✅ Make removal an *explicit* action (long press) instead of simple tap
+                    itemView.setOnLongClickListener {
+                        // Simple UX: hold to remove a friend
+                        onRemoveFriend(user)
+                        Toast.makeText(
+                            itemView.context,
+                            "Friend removed",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        true
+                    }
                 }
                 FriendshipStatus.PENDING_INCOMING -> {
                     requestButtons.visibility = View.VISIBLE
                     btnAccept.setOnClickListener {
                         onAcceptRequest(user)
-                        Toast.makeText(itemView.context, "Friend request accepted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            itemView.context,
+                            "Friend request accepted",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     btnReject.setOnClickListener {
                         onRejectRequest(user)
-                        Toast.makeText(itemView.context, "Friend request rejected", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            itemView.context,
+                            "Friend request rejected",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 FriendshipStatus.PENDING_OUTGOING -> {
@@ -92,15 +124,17 @@ class FriendsAdapter(
                 }
                 FriendshipStatus.NOT_FRIENDS -> {
                     btnAddFriend.visibility = View.VISIBLE
-                    btnAddFriend.setBackgroundResource(R.drawable.bg_friend_add)
-                    btnAddFriend.setTextColor(itemView.resources.getColor(android.R.color.white))
-                    btnAddFriend.text = "Add"
                     btnAddFriend.setOnClickListener {
                         onAddFriend(user)
+                        // temporary UI feedback; Firestore listener will update the real state
                         btnAddFriend.isEnabled = false
                         btnAddFriend.text = "Requested"
                         btnAddFriend.setBackgroundResource(R.drawable.bg_friend_requested)
-                        Toast.makeText(itemView.context, "Friend request sent", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            itemView.context,
+                            "Friend request sent",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

@@ -88,29 +88,49 @@ class FriendsFragment : Fragment() {
         friendsListener = db.collection("users").document(currentUserUid)
             .collection("friends")
             .addSnapshotListener { snapshot, e ->
-                if (e != null || snapshot == null) return@addSnapshotListener
+                if (e != null || snapshot == null || _binding == null) return@addSnapshotListener
 
-                // Use temp lists to avoid flicker
+                if (snapshot.isEmpty) {
+                    friendsList.clear()
+                    requestsList.clear()
+                    outgoingRequests.clear()
+                    updateAdapters()
+                    return@addSnapshotListener
+                }
+
                 val newFriends = mutableListOf<Friend>()
                 val newRequests = mutableListOf<Friend>()
                 val newOutgoing = mutableListOf<Friend>()
 
-                snapshot.documents.forEach { doc ->
-                    val friendId = doc.id
-                    if (friendId == currentUserUid) return@forEach
-                    val statusString = doc.getString("status") ?: return@forEach
+                var remaining = snapshot.documents.size
 
+                for (doc in snapshot.documents) {
+                    val friendId = doc.id
+                    if (friendId == currentUserUid) {
+                        remaining--
+                        if (remaining == 0) applyNewLists(newFriends, newRequests, newOutgoing)
+                        continue
+                    }
+
+                    val statusString = doc.getString("status")
                     val status = when (statusString) {
                         "accepted" -> FriendshipStatus.FRIENDS
                         "pending_incoming" -> FriendshipStatus.PENDING_INCOMING
                         "pending_outgoing" -> FriendshipStatus.PENDING_OUTGOING
-                        else -> return@forEach
+                        else -> null
+                    }
+
+                    if (status == null) {
+                        remaining--
+                        if (remaining == 0) applyNewLists(newFriends, newRequests, newOutgoing)
+                        continue
                     }
 
                     db.collection("users").document(friendId).get()
                         .addOnSuccessListener { userDoc ->
                             val friend = userDoc.toObject(Friend::class.java)
                                 ?.copy(uid = friendId, status = status)
+
                             if (friend != null) {
                                 when (status) {
                                     FriendshipStatus.FRIENDS -> newFriends.add(friend)
@@ -118,18 +138,33 @@ class FriendsFragment : Fragment() {
                                     FriendshipStatus.PENDING_OUTGOING -> newOutgoing.add(friend)
                                     else -> {}
                                 }
-
-                                // After all async reads finish, update lists
-                                if (userDoc != null && _binding != null) {
-                                    friendsList.clear(); friendsList.addAll(newFriends)
-                                    requestsList.clear(); requestsList.addAll(newRequests)
-                                    outgoingRequests.clear(); outgoingRequests.addAll(newOutgoing)
-                                    updateAdapters()
-                                }
+                            }
+                        }
+                        .addOnCompleteListener {
+                            remaining--
+                            if (remaining == 0 && _binding != null) {
+                                applyNewLists(newFriends, newRequests, newOutgoing)
                             }
                         }
                 }
             }
+    }
+
+    private fun applyNewLists(
+        newFriends: List<Friend>,
+        newRequests: List<Friend>,
+        newOutgoing: List<Friend>
+    ) {
+        friendsList.clear()
+        friendsList.addAll(newFriends.distinctBy { it.uid })
+
+        requestsList.clear()
+        requestsList.addAll(newRequests.distinctBy { it.uid })
+
+        outgoingRequests.clear()
+        outgoingRequests.addAll(newOutgoing.distinctBy { it.uid })
+
+        updateAdapters()
     }
 
     /* ░░░ SEARCH USERS ░░░ */
@@ -149,6 +184,7 @@ class FriendsFragment : Fragment() {
 
     private fun searchUsers(query: String?) {
         if (query.isNullOrBlank()) {
+            // show default friends + outgoing requests
             friendsAdapter.updateUsers(friendsList + outgoingRequests)
             return
         }
@@ -184,10 +220,10 @@ class FriendsFragment : Fragment() {
     }
 
     /* ░░░ FRIEND REQUEST HANDLERS ░░░ */
+
     private fun sendFriendRequest(user: Friend) {
         val currentUserUid = auth.currentUser?.uid ?: return
 
-        // Batch both writes to keep atomic
         val batch = db.batch()
         val senderRef = db.collection("users").document(currentUserUid)
             .collection("friends").document(user.uid)
@@ -196,11 +232,9 @@ class FriendsFragment : Fragment() {
 
         batch.set(senderRef, mapOf("status" to "pending_outgoing"))
         batch.set(receiverRef, mapOf("status" to "pending_incoming"))
-        batch.commit().addOnSuccessListener {
-            user.status = FriendshipStatus.PENDING_OUTGOING
-            outgoingRequests.add(user)
-            updateAdapters()
-        }
+
+        // 🔑 Let the snapshot listener update lists; no manual list changes here
+        batch.commit()
     }
 
     private fun acceptFriendRequest(user: Friend) {
@@ -244,7 +278,7 @@ class FriendsFragment : Fragment() {
     }
 
     private fun updateAdapters() {
-        val combined = friendsList + outgoingRequests
+        val combined = (friendsList + outgoingRequests).distinctBy { it.uid }
         friendsAdapter.updateUsers(combined)
         requestsAdapter.updateUsers(requestsList)
 
@@ -257,6 +291,7 @@ class FriendsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         friendsListener?.remove()
+        friendsListener = null
         _binding = null
     }
 }
