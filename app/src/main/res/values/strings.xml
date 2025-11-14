@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Mobile Project</string>
+    <string name="app_name">Local Adventure Generator</string>
 
     <string name="login_title">Welcome back</string>
     <string name="register_title">Create account</string>
