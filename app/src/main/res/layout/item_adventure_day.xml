@@ -21,6 +21,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
             android:text="Your Adventure Day: "
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:textColor="#A7226E"
@@ -32,6 +33,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
             android:text="Eats: "
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
             android:textColor="#2F9599"
@@ -48,6 +50,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poppinssemibold"
             android:text="Activity: "
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
             android:textColor="#2F9599"

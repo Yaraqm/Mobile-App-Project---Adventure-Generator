@@ -28,6 +28,7 @@
             <TextView
                 android:id="@+id/adventureName"
                 style="@style/TextAppearance.Material3.TitleMedium"
+                android:fontFamily="@font/poppinssemibold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="2"
@@ -37,6 +38,7 @@
             <TextView
                 android:id="@+id/adventureCategory"
                 style="@style/TextAppearance.Material3.BodySmall"
+                android:fontFamily="@font/poppinssemibold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
@@ -46,6 +48,7 @@
             <TextView
                 android:id="@+id/adventureDescription"
                 style="@style/TextAppearance.Material3.BodyMedium"
+                android:fontFamily="@font/poppinssemibold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -57,6 +60,7 @@
             <TextView
                 android:id="@+id/adventureCity"
                 style="@style/TextAppearance.Material3.BodySmall"
+                android:fontFamily="@font/poppinssemibold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="6dp"

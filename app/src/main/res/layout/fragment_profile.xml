@@ -52,6 +52,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="70dp"
+                        android:fontFamily="@font/poppinssemibold"
                         android:text="User Name"
                         android:textSize="22sp"
                         android:textStyle="bold"
@@ -62,6 +63,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:fontFamily="@font/poppinssemibold"
                         android:text="user.email@example.com"
                         android:textSize="16sp"
                         android:textColor="#555555" />
@@ -71,6 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
+                        android:fontFamily="@font/poppinssemibold"
                         android:text="Joined: ..."
                         android:textSize="14sp"
                         android:textColor="#888888" />
@@ -81,6 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+                        android:fontFamily="@font/poppinssemibold"
                         android:text="Tap to add a short bio..."
                         android:textColor="#777777"
                         android:textSize="14sp"
@@ -118,6 +122,7 @@
                             android:id="@+id/userSpotsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="0"
                             android:textStyle="bold"
                             android:textSize="18sp"
@@ -125,6 +130,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="Spots"
                             android:textSize="13sp"
                             android:textColor="#888888" />
@@ -142,6 +148,7 @@
                             android:id="@+id/userFriendsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="0"
                             android:textStyle="bold"
                             android:textSize="18sp"
@@ -149,6 +156,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="Friends"
                             android:textSize="13sp"
                             android:textColor="#888888" />
@@ -165,6 +173,7 @@
                             android:id="@+id/userReviewsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="0"
                             android:textStyle="bold"
                             android:textSize="18sp"
@@ -172,6 +181,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="Reviews"
                             android:textSize="13sp"
                             android:textColor="#888888" />
@@ -188,6 +198,7 @@
                             android:id="@+id/userPoints"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="0"
                             android:textStyle="bold"
                             android:textSize="18sp"
@@ -195,6 +206,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinssemibold"
                             android:text="Points"
                             android:textSize="13sp"
                             android:textColor="#888888" />
@@ -218,6 +230,7 @@
                     app:tabIndicatorColor="#A7226E"
                     app:tabSelectedTextColor="#A7226E"
                     app:tabTextColor="#888888"
+                    android:fontFamily="@font/poppinssemibold"
                     android:background="#FFFFFF">
 
                     <com.google.android.material.tabs.TabItem
@@ -230,6 +243,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:icon="@android:drawable/btn_star_big_on"
+                        android:fontFamily="@font/poppinssemibold"
                         android:text="Favorites" />
                 </com.google.android.material.tabs.TabLayout>
 
@@ -263,6 +277,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="85dp"
                 android:layout_marginTop="24dp"
+                android:fontFamily="@font/poppinssemibold"
                 android:text="Log Out"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#EC2049" />

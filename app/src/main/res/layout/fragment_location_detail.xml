@@ -24,6 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:fontFamily="@font/poppinssemibold"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
         app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,6 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:fontFamily="@font/poppinssemibold"
         android:background="@drawable/abc_dialog_material_background"
         android:paddingStart="8dp"
         android:paddingTop="4dp"
@@ -53,6 +55,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:fontFamily="@font/poppinssemibold"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,6 +69,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppinssemibold"
         android:text="Get Directions"
         app:icon="@drawable/ic_directions"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,6 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
+            android:fontFamily="@font/poppinssemibold"
             android:text="Add to Favorites" />
 
         <com.google.android.material.button.MaterialButton
@@ -96,6 +101,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/poppinssemibold"
             android:text="I Visited!" />
 
     </LinearLayout>
@@ -106,6 +112,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppinssemibold"
         android:text="Reviews"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,6 +124,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/poppinssemibold"
         android:text="Leave a Review"
         app:icon="@drawable/ic_edit"
         app:layout_constraintBottom_toBottomOf="@id/text_reviews_title"

@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
+            android:fontFamily="@font/poppinssemibold"
             app:queryHint="Search for users..." />
     </LinearLayout>
 
@@ -40,6 +41,7 @@
         android:id="@+id/requests_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/poppinssemibold"
         android:text="Friend Requests"
         android:textStyle="bold"
         android:visibility="gone"
@@ -57,6 +59,7 @@
         android:id="@+id/friends_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/poppinssemibold"
         android:text="Friends"
         android:textStyle="bold"
         android:textAppearance="?attr/textAppearanceHeadline6" />

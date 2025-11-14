@@ -39,6 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                android:fontFamily="@font/poppinssemibold"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 tools:text="Friend Name" />
 
@@ -46,6 +47,7 @@
                 android:id="@+id/friend_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/poppinssemibold"
                 android:textAppearance="?attr/textAppearanceBody2"
                 tools:text="friend@email.com" />
 
@@ -73,6 +75,7 @@
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppinssemibold"
                     android:text="Accept" />
 
                 <Button
@@ -81,6 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/holo_red_light"
+                    android:fontFamily="@font/poppinssemibold"
                     android:text="Reject" />
             </LinearLayout>
 
@@ -89,6 +93,7 @@
                 android:id="@+id/btn_add_friend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/poppinssemibold"
                 android:text="Add"
                 android:visibility="gone"
                 android:layout_gravity="center" />
@@ -98,6 +103,7 @@
                 android:id="@+id/friend_status_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/poppinssemibold"
                 android:text="Friend"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"

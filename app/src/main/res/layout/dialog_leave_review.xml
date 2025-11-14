@@ -8,6 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/poppinssemibold"
         android:text="Your Rating"
         android:textAppearance="?attr/textAppearanceBody2" />
 
@@ -24,11 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:fontFamily="@font/poppinssemibold"
         android:hint="Write your review...">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_review"
             android:layout_width="match_parent"
+            android:fontFamily="@font/poppinssemibold"
             android:layout_height="wrap_content"
             android:gravity="top"
             android:inputType="textMultiLine"

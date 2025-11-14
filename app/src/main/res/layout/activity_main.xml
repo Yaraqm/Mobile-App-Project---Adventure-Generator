@@ -12,6 +12,7 @@
     <!-- Fragment container will take up the remaining space -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
+        android:fontFamily="@font/poppinssemibold"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -22,6 +23,7 @@
     <!-- Bottom Navigation at the bottom -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        android:fontFamily="@font/poppinssemibold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:menu="@menu/menu_bottom_nav"
