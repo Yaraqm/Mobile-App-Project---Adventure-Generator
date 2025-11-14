@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#AA000000"
     android:gravity="center">
 
+    <!-- Image preview (photos only) -->
     <ImageView
         android:id="@+id/dialogImage"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:scaleType="centerCrop"
         android:layout_gravity="center"
-        android:background="#FFFFFF" />
+        android:background="#FFFFFF"
+        android:visibility="gone" />
 
+    <!-- Video preview (videos only) -->
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/dialogVideoPlayer"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:background="#000000"
+        app:use_controller="true"
+        app:show_buffering="when_playing"
+        android:visibility="gone" />
+
+    <!-- Close button -->
     <ImageButton
         android:id="@+id/btnClose"
         android:layout_width="40dp"
@@ -21,8 +36,9 @@
         android:layout_margin="16dp"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
-        android:tint="#FFFFFF" />
+        app:tint="#FFFFFF" />
 
+    <!-- Delete button -->
     <ImageButton
         android:id="@+id/btnDelete"
         android:layout_width="40dp"
@@ -31,6 +47,6 @@
         android:layout_margin="24dp"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_delete"
-        android:tint="#FF4444" />
+        app:tint="#FF4444" />
 
 </FrameLayout>

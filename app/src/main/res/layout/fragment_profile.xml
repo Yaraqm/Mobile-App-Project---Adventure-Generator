@@ -258,18 +258,6 @@
                     android:nestedScrollingEnabled="true" />
             </LinearLayout>
 
-            <!-- ░░░ UPLOAD PHOTO FLOATING BUTTON ░░░ -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnUploadPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:src="@android:drawable/ic_menu_add"
-                app:backgroundTint="#A7226E"
-                app:tint="@android:color/white" />
-
             <!-- ░░░ LOGOUT ░░░ -->
             <Button
                 android:id="@+id/logoutButton"

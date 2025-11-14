@@ -11,30 +11,71 @@ import com.example.mobileproject.models.Photo
 
 class PhotoAdapter(
     private val photos: List<Photo>,
-    private val onPhotoClicked: (Photo) -> Unit
-) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
+    private val onAddClicked: () -> Unit,
+    private val onMediaClicked: (Photo) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    inner class PhotoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val imageView: ImageView = view.findViewById(R.id.imagePhoto)
+    companion object {
+        private const val VIEW_TYPE_ADD = 0
+        private const val VIEW_TYPE_MEDIA = 1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_photo, parent, false)
-        return PhotoViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        val photo = photos[position]
-        Glide.with(holder.itemView.context)
-            .load(photo.imageUrl)
-            .centerCrop()
-            .into(holder.imageView)
-
-        holder.imageView.setOnClickListener {
-            onPhotoClicked(photo)
+    inner class AddViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        init {
+            view.setOnClickListener { onAddClicked() }
         }
     }
 
-    override fun getItemCount() = photos.size
+    inner class MediaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imageView: ImageView = view.findViewById(R.id.imagePhoto)
+        val iconVideo: ImageView = view.findViewById(R.id.iconVideo)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position == 0) VIEW_TYPE_ADD else VIEW_TYPE_MEDIA
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return when (viewType) {
+            VIEW_TYPE_ADD -> {
+                val view = inflater.inflate(R.layout.item_add_tile, parent, false)
+                AddViewHolder(view)
+            }
+            else -> {
+                val view = inflater.inflate(R.layout.item_photo, parent, false)
+                MediaViewHolder(view)
+            }
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (getItemViewType(position) == VIEW_TYPE_ADD) {
+            // Nothing else to bind; click is set in ViewHolder init
+            return
+        }
+
+        val photo = photos[position - 1]  // because 0 is the add tile
+        val mediaHolder = holder as MediaViewHolder
+
+        // Thumbnail (photo or video frame)
+        Glide.with(mediaHolder.itemView.context)
+            .load(photo.mediaUrl)
+            .centerCrop()
+            .into(mediaHolder.imageView)
+
+
+        // Show play icon only for videos
+        if (photo.type == "video") {
+            mediaHolder.iconVideo.visibility = View.VISIBLE
+        } else {
+            mediaHolder.iconVideo.visibility = View.GONE
+        }
+
+        mediaHolder.imageView.setOnClickListener {
+            onMediaClicked(photo)
+        }
+    }
+
+    override fun getItemCount(): Int = photos.size + 1 // +1 for the add tile
 }

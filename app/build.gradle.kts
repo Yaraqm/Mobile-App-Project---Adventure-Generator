@@ -90,6 +90,9 @@ dependencies {
     implementation("io.ktor:ktor-client-android:2.3.5")
     implementation("io.github.jan-tennert.supabase:storage-kt:2.4.1")
 
+    // Video Playing
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+
     // Kotlin Coroutines (for async background tasks)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
