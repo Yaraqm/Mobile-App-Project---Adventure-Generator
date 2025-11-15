@@ -32,12 +32,12 @@
     <color name="md_blue_grey_500">#f69f95</color>
 
     <!-- *** NEW: ADD THESE COLORS FOR THE CATEGORY CHIPS *** -->
-    <color name="chip_color_1">#c5e5e8</color> <!-- Blue -->
-    <color name="chip_color_2">#9dbf9e</color> <!-- Teal -->
-    <color name="chip_color_3">#ffdab9</color> <!-- Orange -->
-    <color name="chip_color_4">#d8bfd8</color> <!-- Purple -->
-    <color name="chip_color_5">#ffa07a</color> <!-- Red -->
-    <color name="chip_color_6">#acefac</color> <!-- Green -->
+    <color name="chip_color_1">#64B5F6</color> <!-- Blue -->
+    <color name="chip_color_2">#4DB6AC</color> <!-- Teal -->
+    <color name="chip_color_3">#FFB74D</color> <!-- Orange -->
+    <color name="chip_color_4">#BA68C8</color> <!-- Purple -->
+    <color name="chip_color_5">#E57373</color> <!-- Red -->
+    <color name="chip_color_6">#81C784</color> <!-- Green -->
 
 
 </resources>

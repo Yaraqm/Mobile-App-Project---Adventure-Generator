@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    This Color State List defines the background and text colors for our filter chips
-    based on their checked (selected) state.
--->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- State when the chip is CHECKED (selected) -->
-    <item android:color="?attr/colorOnPrimary" android:state_checked="true" />
-
-    <!-- Default state when the chip is NOT checked -->
-    <item android:color="?attr/colorOnSurface" />
-
+    <item android:color="@android:color/white" />
 </selector>
