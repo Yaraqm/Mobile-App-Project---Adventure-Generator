@@ -22,7 +22,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
         super.onCreate()
         registerActivityLifecycleCallbacks(this)
 
-        // ✅ Initialize Firebase App Check
+        // Initialize Firebase App Check
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
         firebaseAppCheck.installAppCheckProviderFactory(
             if (BuildConfig.DEBUG) {
@@ -32,7 +32,7 @@ class MyApplication : Application(), Application.ActivityLifecycleCallbacks {
             }
         )
 
-        // ✅ Initialize Supabase connection (logs confirmation)
+        // Initialize Supabase connection (logs confirmation)
         SupabaseHelper.logConnection()
 
         // Prepare MediaPlayer

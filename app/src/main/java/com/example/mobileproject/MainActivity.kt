@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sensorManager: SensorManager
     private var tempSensor: Sensor? = null
-
     lateinit var temperatureCard: CardView
     private lateinit var temperatureMessage: TextView
     private lateinit var musicIcon: ImageView
@@ -97,7 +96,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Not needed
+
     }
 
     private fun updateTemperatureMessage(temp: Float) {

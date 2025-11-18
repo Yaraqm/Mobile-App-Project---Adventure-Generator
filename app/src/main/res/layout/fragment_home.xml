@@ -80,16 +80,17 @@
                     android:id="@+id/spinButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="6dp"
                     android:backgroundTint="#A7226E"
                     android:fontFamily="@font/poppinssemibold"
                     android:text="Spin the Wheel" />
+
 
                 <Button
                     android:id="@+id/generateAdventureButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="6dp"
                     android:backgroundTint="#2E86AB"
                     android:fontFamily="@font/poppinssemibold"
                     android:text="Generate Adventure" />

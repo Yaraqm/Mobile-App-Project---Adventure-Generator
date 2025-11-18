@@ -70,7 +70,7 @@ class HomeFragment : Fragment(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        // --- My change: Show temperature card ---
+
         (requireActivity() as MainActivity).temperatureCard.visibility = View.VISIBLE
 
         if (categories.isEmpty()) {
@@ -84,7 +84,7 @@ class HomeFragment : Fragment(), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        // --- My change: Hide temperature card ---
+
         (requireActivity() as MainActivity).temperatureCard.visibility = View.GONE
 
         sensorManager.unregisterListener(this)
@@ -138,8 +138,6 @@ class HomeFragment : Fragment(), SensorEventListener {
             }
 
             disableButtons()
-            //binding.adventurePopupContainer.isVisible = false
-            //adventureAdapter.submitList(emptyList())
 
             val targetIndex = (0 until categories.size).random()
 
@@ -166,7 +164,7 @@ class HomeFragment : Fragment(), SensorEventListener {
                     val randomLocation = locationsList.random()
                     val singleItem = AdventureListItem.SingleLocation(randomLocation)
 
-                    // This is the ideal place to clear and then submit
+
                     adventureAdapter.submitList(listOf(singleItem))
                 }
                 binding.adventurePopupContainer.isVisible = true
@@ -188,7 +186,6 @@ class HomeFragment : Fragment(), SensorEventListener {
 
     private fun generateAdventureDay() {
         disableButtons()
-        // The lines that hide the popup and clear the list have been removed from the start.
 
         val locationsCollection = firestore.collection("locations")
 
@@ -223,7 +220,7 @@ class HomeFragment : Fragment(), SensorEventListener {
                         // Create the combined adventure item
                         val adventureDayItem = AdventureListItem.AdventureDay(randomFoodLocation, randomActivityLocation)
 
-                        // --- This is the new, correct logic ---
+
                         // 1. Clear the old adapter data and submit the new item
                         adventureAdapter.submitList(listOf(adventureDayItem))
                         // 2. Set the result text

@@ -25,12 +25,17 @@ class LuckyWheelView @JvmOverloads constructor(
         setShadowLayer(4f, 2f, 2f, Color.argb(128, 0, 0, 0))
     }
 
+    private val GLOW_STROKE_WIDTH = 30f // Define the width of the glow outline
+
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        // --- UPDATED: Use STROKE for an outline effect ---
         style = Paint.Style.STROKE
-        strokeWidth = 20f
-        color = Color.parseColor("#F7DB4F")
-        maskFilter = BlurMaskFilter(25f, BlurMaskFilter.Blur.OUTER)
+        strokeWidth = GLOW_STROKE_WIDTH // Set the width of the stroke
+        color = Color.parseColor("#FFFFC5") // Your existing glow color
+        // Set the blur radius slightly less than the stroke width
+        maskFilter = BlurMaskFilter(GLOW_STROKE_WIDTH / 2f, BlurMaskFilter.Blur.NORMAL)
     }
+
 
     // This is now a base palette of colors to cycle through.
     private val baseColors = listOf(
@@ -86,8 +91,11 @@ class LuckyWheelView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val viewSize = w.coerceAtMost(h)
+        // Adjust radius to account for the glow stroke width, so the glow is fully visible
         radius = (viewSize / 2f) * 0.9f
         center = PointF(w / 2f, h / 2f)
+        // The bounds of the arc should be slightly smaller than the total circle to allow the stroke to sit inside.
+        // We'll use the original bounds and let the STROKE style draw the outline.
         wheelBounds = RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius)
     }
 
@@ -100,26 +108,39 @@ class LuckyWheelView @JvmOverloads constructor(
         canvas.rotate(currentRotation, center.x, center.y)
 
         val angle = 360f / segments.size
+
+        // --- Draw the main wheel segments and text FIRST (No change needed here) ---
         for (i in segments.indices) {
-            segmentPaint.color = segmentColors[i] // Use the dynamically generated color
+            segmentPaint.color = segmentColors[i]
             val startAngle = i * angle
             canvas.drawArc(wheelBounds, startAngle, angle, true, segmentPaint)
 
+            // Draw the text
             val path = Path()
             path.addArc(wheelBounds, startAngle, angle)
             val text = segments[i]
-            val textVerticalOffset = radius * 0.15f
-            canvas.drawTextOnPath(text, path, 0f, textVerticalOffset + (textPaint.textSize / 2), textPaint)
+            val textVerticalOffset = radius * 0.25f
+            canvas.drawTextOnPath(text, path, 0f, textVerticalOffset, textPaint)
         }
 
-        // Draw the glow effect on the rotated canvas so it lands on the winner.
         if (winningSegmentIndex != -1) {
-            val startAngle = winningSegmentIndex * angle
-            canvas.drawArc(wheelBounds, startAngle, angle, true, glowPaint)
+            val segmentIndex = winningSegmentIndex
+            val startAngle = segmentIndex * angle
+
+            val halfStroke = GLOW_STROKE_WIDTH / 2f
+            val glowBounds = RectF(
+                wheelBounds.left + halfStroke,
+                wheelBounds.top + halfStroke,
+                wheelBounds.right - halfStroke,
+                wheelBounds.bottom - halfStroke
+            )
+
+            canvas.drawArc(glowBounds, startAngle, angle, true, glowPaint)
         }
 
         canvas.restore()
     }
+
 
     /**
      * Rotates the wheel to land on a specific target segment.
@@ -165,7 +186,6 @@ class LuckyWheelView @JvmOverloads constructor(
         animator.start()
     }
 }
-
 
 
 
