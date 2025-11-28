@@ -233,7 +233,6 @@ class FriendsFragment : Fragment() {
         batch.set(senderRef, mapOf("status" to "pending_outgoing"))
         batch.set(receiverRef, mapOf("status" to "pending_incoming"))
 
-        // 🔑 Let the snapshot listener update lists; no manual list changes here
         batch.commit()
     }
 
