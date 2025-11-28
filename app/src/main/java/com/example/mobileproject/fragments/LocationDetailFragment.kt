@@ -28,7 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.PropertyName
-import java.net.URLEncoder // <<< --- NEW IMPORT FOR ENCODING
+import java.net.URLEncoder
 
 data class LocationDetails(
     val name: String? = null,
@@ -70,13 +70,13 @@ class LocationDetailFragment : Fragment() {
         checkIfVisited()
         setupReviewsRecyclerView()
 
-        // --- Set up all button click listeners ---
+
         binding.btnAddFavorite.setOnClickListener { addOrRemoveFavorite() }
         binding.btnVisited.setOnClickListener { addOrRemoveVisited() }
         binding.btnLeaveReview.setOnClickListener { showLeaveReviewDialog() }
         binding.btnBack.setOnClickListener { findNavController().popBackStack() }
 
-        // Set up the click listener for the directions button
+
         binding.btnGetDirections.setOnClickListener {
             currentLocationDetails?.let { details ->
                 launchDirectionsIntent(details)
@@ -84,12 +84,7 @@ class LocationDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * *** MODIFIED AND FINAL VERSION ***
-     * This function now creates a search intent for Google Maps.
-     * This shows the user the location on the map and lets them choose the transport mode,
-     * rather than forcing immediate turn-by-turn navigation.
-     */
+
     private fun launchDirectionsIntent(details: LocationDetails) {
         val locationName = details.name
         val locationCity = details.city
@@ -140,9 +135,6 @@ class LocationDetailFragment : Fragment() {
                 Log.e("LocationDetailFragment", "Error getting location details", exception)
             }
     }
-
-    // --- NO OTHER CHANGES ARE NEEDED BELOW THIS LINE ---
-    // The rest of your file correctly handles UI and other logic.
 
     private fun setupReviewsRecyclerView() {
         binding.reviewsRecyclerView.layoutManager = LinearLayoutManager(context)
