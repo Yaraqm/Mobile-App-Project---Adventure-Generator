@@ -51,21 +51,18 @@ class PhotoAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == VIEW_TYPE_ADD) {
-            // Nothing else to bind; click is set in ViewHolder init
             return
         }
 
-        val photo = photos[position - 1]  // because 0 is the add tile
+        val photo = photos[position - 1] 
         val mediaHolder = holder as MediaViewHolder
 
-        // Thumbnail (photo or video frame)
         Glide.with(mediaHolder.itemView.context)
             .load(photo.mediaUrl)
             .centerCrop()
             .into(mediaHolder.imageView)
 
 
-        // Show play icon only for videos
         if (photo.type == "video") {
             mediaHolder.iconVideo.visibility = View.VISIBLE
         } else {
@@ -77,5 +74,5 @@ class PhotoAdapter(
         }
     }
 
-    override fun getItemCount(): Int = photos.size + 1 // +1 for the add tile
+    override fun getItemCount(): Int = photos.size + 1
 }
