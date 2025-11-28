@@ -28,7 +28,7 @@ import com.google.firebase.firestore.PropertyName
 /**
  * A data class representing a single location spot retrieved from Firestore.
  * The @PropertyName annotation is crucial for mapping the "map point" field name
- * from the database (which contains a space) to the valid Kotlin property name `map_point`.
+ * from the database to the valid Kotlin property name `map_point`.
  */
 data class LocationSpot(
     val id: String = "",
@@ -88,7 +88,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, SearchV
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        // *** MODIFIED: Pass the currently selected category when submitting text search. ***
+       
         val selectedCategory = getSelectedCategory()
         filterMarkers(query, selectedCategory)
         binding.mapSearchView.clearFocus()
@@ -96,14 +96,14 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, SearchV
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        // *** MODIFIED: Pass the currently selected category when changing text search. ***
+        
         val selectedCategory = getSelectedCategory()
         filterMarkers(newText, selectedCategory)
         return true
     }
 
     /**
-     * *** NEW: Helper function to get the text of the currently selected chip. ***
+     * Helper function to get the text of the currently selected chip. ***
      * Returns null if "All" is selected.
      */
     private fun getSelectedCategory(): String? {
@@ -123,7 +123,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, SearchV
             val location = allLocations.find { it.id == locationId }
 
             val matchesText = location?.name.orEmpty().contains(normalizedTextQuery, ignoreCase = true)
-            // *** MODIFIED: The category filter logic is now fully active. ***
+            // The category filter logic
             val matchesCategory = categoryQuery == null || location?.category == categoryQuery
 
             marker.isVisible = matchesText && matchesCategory
@@ -177,12 +177,12 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, SearchV
 
         val categories = allLocations.mapNotNull { it.category }.distinct()
 
-        // *** MODIFIED: Assign a default grey color to the "All" chip. ***
+        // Assign a default grey color to the "All" chip.
         val allChip = createChip("All", android.R.color.darker_gray)
         allChip.isCloseIconVisible = false
         chipGroup.addView(allChip)
 
-        // *** MODIFIED: Loop through categories and assign a unique color from our list. ***
+        // Loop through categories and assign a unique color from our list.
         categories.forEachIndexed { index, category ->
             val colorResId = chipColors[index % chipColors.size] // Cycle through colors
             chipGroup.addView(createChip(category, colorResId))
@@ -196,14 +196,14 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback, SearchV
                 return@setOnCheckedChangeListener
             }
 
-            // *** MODIFIED: Get the selected category and trigger the filter. ***
+            //Get the selected category and trigger the filter.
             val selectedCategory = getSelectedCategory()
             filterMarkers(binding.mapSearchView.query.toString(), selectedCategory)
         }
     }
 
     /**
-     * *** MODIFIED: This helper function now accepts a color resource ID. ***
+     * This helper function now accepts a color resource ID. ***
      * It creates and styles a single Chip, setting its background and text colors to be state-aware.
      */
     private fun createChip(text: String, colorResId: Int): Chip {
