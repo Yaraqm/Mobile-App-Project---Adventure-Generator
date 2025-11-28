@@ -31,7 +31,7 @@
     <color name="md_pink_500">#ffb6c1</color>
     <color name="md_blue_grey_500">#f69f95</color>
 
-    <!-- *** NEW: ADD THESE COLORS FOR THE CATEGORY CHIPS *** -->
+    <!-- THESE COLORS ARE FOR THE CATEGORY CHIPS  -->
     <color name="chip_color_1">#64B5F6</color> <!-- Blue -->
     <color name="chip_color_2">#4DB6AC</color> <!-- Teal -->
     <color name="chip_color_3">#FFB74D</color> <!-- Orange -->
