@@ -158,7 +158,7 @@ class HomeFragment : Fragment(), SensorEventListener {
 
                 if (documents.isEmpty()) {
                     Toast.makeText(context, "No locations found for '$category'", Toast.LENGTH_SHORT).show()
-                    adventureAdapter.submitList(emptyList()) // Clear the list if nothing is found
+                    adventureAdapter.submitList(emptyList()) 
                 } else {
                     val locationsList = documents.toObjects(Adventure::class.java)
                     val randomLocation = locationsList.random()
@@ -189,7 +189,6 @@ class HomeFragment : Fragment(), SensorEventListener {
 
         val locationsCollection = firestore.collection("locations")
 
-        // First, get a random "Food & Drink" location
         locationsCollection.whereEqualTo("category", "Food & Drink").get()
             .addOnSuccessListener { foodDocuments ->
                 if (foodDocuments.isEmpty()) {
@@ -199,7 +198,6 @@ class HomeFragment : Fragment(), SensorEventListener {
                 }
                 val randomFoodLocation = foodDocuments.toObjects(Adventure::class.java).random()
 
-                // Then, get a random location from any other category
                 val otherCategories = categories.filter { it.equals("Food & Drink", ignoreCase = true).not() }
                 if (otherCategories.isEmpty()) {
                     Toast.makeText(context, "No other activity categories found.", Toast.LENGTH_SHORT).show()
@@ -221,11 +219,10 @@ class HomeFragment : Fragment(), SensorEventListener {
                         val adventureDayItem = AdventureListItem.AdventureDay(randomFoodLocation, randomActivityLocation)
 
 
-                        // 1. Clear the old adapter data and submit the new item
                         adventureAdapter.submitList(listOf(adventureDayItem))
-                        // 2. Set the result text
+
                         binding.resultText.text = "🎉 Your Full Day Adventure! 🎉"
-                        // 3. Make the entire popup container visible
+
                         binding.adventurePopupContainer.isVisible = true
 
                         enableButtons()
