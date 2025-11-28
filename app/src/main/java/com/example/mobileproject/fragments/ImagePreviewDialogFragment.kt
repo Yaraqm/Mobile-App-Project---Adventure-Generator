@@ -15,7 +15,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 class ImagePreviewDialogFragment : DialogFragment() {
 
     private var mediaUrl: String? = null
-    private var mediaType: String? = null // "photo" or "video"
+    private var mediaType: String? = null
     private var onDeleteClicked: (() -> Unit)? = null
 
     private var exoPlayer: ExoPlayer? = null
