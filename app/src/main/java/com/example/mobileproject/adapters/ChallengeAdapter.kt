@@ -60,7 +60,7 @@ class ChallengeAdapter : RecyclerView.Adapter<ChallengeAdapter.ChallengeViewHold
         var displayProgress = item.progress
         var displayGoal = item.goal
 
-        if (item.goal > 0) { // Avoid division by zero
+        if (item.goal > 0) {
             displayGoal = item.goal * (item.completions + 1)
         }
 
