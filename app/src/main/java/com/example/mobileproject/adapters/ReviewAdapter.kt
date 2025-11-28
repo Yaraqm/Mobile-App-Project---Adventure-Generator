@@ -37,8 +37,8 @@ class ReviewAdapter(private val reviews: List<Review>) : RecyclerView.Adapter<Re
         if (review.userPhotoUrl != null) {
             Glide.with(holder.itemView.context)
                 .load(review.userPhotoUrl)
-                .placeholder(R.drawable.ic_default_profile) // A default icon
-                .error(R.drawable.ic_default_profile)       // An error icon
+                .placeholder(R.drawable.ic_default_profile)
+                .error(R.drawable.ic_default_profile)  
                 .into(holder.reviewerImage)
         } else {
             // Set a default image if the user has no photo
