@@ -2,7 +2,6 @@ package com.example.mobileproject.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-//import androidx.compose.ui.semantics.text
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +9,6 @@ import com.example.mobileproject.databinding.ItemAdventureBinding
 import com.example.mobileproject.databinding.ItemAdventureDayBinding
 import com.example.mobileproject.models.Adventure
 
-// The sealed class is correct
 sealed class AdventureListItem {
     data class SingleLocation(val adventure: Adventure) : AdventureListItem()
     data class AdventureDay(val food: Adventure, val activity: Adventure) : AdventureListItem()
@@ -34,7 +32,6 @@ class AdventureAdapter(
             val inflater = LayoutInflater.from(container.context)
             val itemBinding = ItemAdventureBinding.inflate(inflater, container, true)
 
-            // --- FIX #1: Add back the missing text fields here ---
             itemBinding.adventureName.text = adventure.name
             itemBinding.adventureCategory.text = adventure.category
             itemBinding.adventureDescription.text = adventure.description
@@ -56,7 +53,7 @@ class AdventureAdapter(
         private val binding: ItemAdventureBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Adventure) {
-            // --- FIX #2: Add back the missing text fields here as well ---
+
             binding.adventureName.text = item.name
             binding.adventureCategory.text = item.category
             binding.adventureDescription.text = item.description
@@ -66,7 +63,6 @@ class AdventureAdapter(
         }
     }
 
-    // The rest of the adapter logic is correct
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
             is AdventureListItem.SingleLocation -> VIEW_TYPE_SINGLE
@@ -98,7 +94,7 @@ class AdventureAdapter(
     }
 }
 
-// DiffUtil is correct
+
 class AdventureDiffCallback : DiffUtil.ItemCallback<AdventureListItem>() {
     override fun areItemsTheSame(oldItem: AdventureListItem, newItem: AdventureListItem): Boolean {
         return when {
