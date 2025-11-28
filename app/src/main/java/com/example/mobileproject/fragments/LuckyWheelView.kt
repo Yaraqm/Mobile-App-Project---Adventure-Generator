@@ -28,16 +28,13 @@ class LuckyWheelView @JvmOverloads constructor(
     private val GLOW_STROKE_WIDTH = 30f // Define the width of the glow outline
 
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        // --- UPDATED: Use STROKE for an outline effect ---
         style = Paint.Style.STROKE
         strokeWidth = GLOW_STROKE_WIDTH // Set the width of the stroke
         color = Color.parseColor("#FFFFC5") // Your existing glow color
-        // Set the blur radius slightly less than the stroke width
         maskFilter = BlurMaskFilter(GLOW_STROKE_WIDTH / 2f, BlurMaskFilter.Blur.NORMAL)
     }
 
 
-    // This is now a base palette of colors to cycle through.
     private val baseColors = listOf(
         R.color.md_green_500,
         R.color.md_blue_500,
@@ -51,7 +48,7 @@ class LuckyWheelView @JvmOverloads constructor(
     )
 
     private var segments = listOf<String>()
-    private var segmentColors = listOf<Int>() // This will be populated dynamically.
+    private var segmentColors = listOf<Int>() 
     private var wheelBounds = RectF()
     private var center = PointF(0f, 0f)
     private var radius = 0f
@@ -59,14 +56,9 @@ class LuckyWheelView @JvmOverloads constructor(
     private var currentRotation = 0f
     private var winningSegmentIndex = -1
 
-    /**
-     * Main function to provide data to the wheel.
-     * This now dynamically generates a color for each segment.
-     */
     fun setData(newSegments: List<String>) {
         this.segments = newSegments
 
-        // --- DYNAMIC COLOR GENERATION ---
         // This ensures the wheel can handle any number of categories.
         val newColors = mutableListOf<Int>()
         for (i in newSegments.indices) {
@@ -94,14 +86,11 @@ class LuckyWheelView @JvmOverloads constructor(
         // Adjust radius to account for the glow stroke width, so the glow is fully visible
         radius = (viewSize / 2f) * 0.9f
         center = PointF(w / 2f, h / 2f)
-        // The bounds of the arc should be slightly smaller than the total circle to allow the stroke to sit inside.
-        // We'll use the original bounds and let the STROKE style draw the outline.
         wheelBounds = RectF(center.x - radius, center.y - radius, center.x + radius, center.y + radius)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        // Guard against drawing if there are no segments or colors.
         if (segments.isEmpty() || segmentColors.isEmpty()) return
 
         canvas.save()
@@ -109,13 +98,11 @@ class LuckyWheelView @JvmOverloads constructor(
 
         val angle = 360f / segments.size
 
-        // --- Draw the main wheel segments and text FIRST (No change needed here) ---
         for (i in segments.indices) {
             segmentPaint.color = segmentColors[i]
             val startAngle = i * angle
             canvas.drawArc(wheelBounds, startAngle, angle, true, segmentPaint)
 
-            // Draw the text
             val path = Path()
             path.addArc(wheelBounds, startAngle, angle)
             val text = segments[i]
@@ -142,9 +129,6 @@ class LuckyWheelView @JvmOverloads constructor(
     }
 
 
-    /**
-     * Rotates the wheel to land on a specific target segment.
-     */
     fun rotateWheelTo(targetIndex: Int, onRotationEnd: () -> Unit) {
         if (segments.isEmpty() || targetIndex < 0 || targetIndex >= segments.size) {
             onRotationEnd()
@@ -152,7 +136,6 @@ class LuckyWheelView @JvmOverloads constructor(
         }
 
         val segmentDegrees = 360f / segments.size
-        // The pointer is at the top (270 degrees on the canvas arc).
         val targetSegmentCenterAngle = 270f - (targetIndex * segmentDegrees) - (segmentDegrees / 2)
         val extraSpins = 360f * 5
         val randomOffset = (Math.random() * (segmentDegrees * 0.8) - (segmentDegrees * 0.4)).toFloat()
