@@ -36,7 +36,6 @@ class FriendsAdapter(
     override fun getItemCount() = users.size
 
     fun updateUsers(newUsers: List<Friend>) {
-        // small safety: never show duplicate rows for same uid
         this.users = newUsers.distinctBy { it.uid }
         notifyDataSetChanged()
     }
@@ -70,10 +69,10 @@ class FriendsAdapter(
             btnAddFriend.visibility = View.GONE
             friendStatusTag.visibility = View.GONE
 
-            itemView.setOnClickListener(null)           // clear old click listeners
+            itemView.setOnClickListener(null)       
             itemView.setOnLongClickListener(null)
 
-            btnAddFriend.isEnabled = true               // re-enable in case a recycled view was disabled
+            btnAddFriend.isEnabled = true    
             btnAddFriend.text = "Add"
             btnAddFriend.setBackgroundResource(R.drawable.bg_friend_add)
             btnAddFriend.setTextColor(
@@ -86,7 +85,6 @@ class FriendsAdapter(
                     friendStatusTag.text = "Friend"
                     friendStatusTag.setBackgroundResource(R.drawable.bg_friend_tag_solid)
 
-                    // ✅ Make removal an *explicit* action (long press) instead of simple tap
                     itemView.setOnLongClickListener {
                         // Simple UX: hold to remove a friend
                         onRemoveFriend(user)
