@@ -97,8 +97,6 @@
 
             </LinearLayout>
 
-            <!-- The result container has been MOVED from here -->
-
         </LinearLayout>
     </ScrollView>
 
