@@ -18,7 +18,7 @@
         <item name="backgroundTint">@color/nav_active_bg</item>
     </style>
 
-    <!-- *** NEW: STYLE FOR FILTER CHIPS *** -->
+    <!-- *** STYLE FOR FILTER CHIPS *** -->
     <!-- This style is used by the category filter chips in the MapFragment. -->
     <style name="Widget.App.Chip.Filter" parent="Widget.MaterialComponents.Chip.Filter">
         <item name="chipIconVisible">false</item>
